@@ -49,14 +49,12 @@ interface Props {
   timeseries: YearlyDataPoint[];
   breakEvenYear: number | null;
   refundDelayYears: number;
-  contributionAmount: number;
 }
 
 export default function WealthChart({
   timeseries,
   breakEvenYear,
   refundDelayYears,
-  contributionAmount,
 }: Props) {
   const [animationProgress, setAnimationProgress] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);

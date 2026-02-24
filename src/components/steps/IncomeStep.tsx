@@ -35,11 +35,12 @@ export default function IncomeStep({ inputs, onChange }: Props) {
             type="number"
             value={inputs.annualIncome}
             onChange={(e) =>
-              onChange({ annualIncome: Math.max(0, Number(e.target.value) || 0) })
+              onChange({ annualIncome: Math.min(100_000_000, Math.max(0, Number(e.target.value) || 0)) })
             }
             className="input-field pl-10"
             step={1000}
             min={0}
+            max={100000000}
           />
         </div>
         <div className="mt-2 flex gap-2">

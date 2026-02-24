@@ -44,7 +44,6 @@ export default function ResultsDashboard({
           timeseries={result.timeseries}
           breakEvenYear={result.breakEvenYear}
           refundDelayYears={inputs.refundDelayYears}
-          contributionAmount={derived.contributionAmount}
         />
       </div>
 

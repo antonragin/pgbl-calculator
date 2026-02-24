@@ -86,6 +86,10 @@ export async function POST(req: NextRequest) {
 
     const fetchController = new AbortController();
     const fetchTimeout = setTimeout(() => fetchController.abort(), 30000);
+
+    // Cancel upstream if client disconnects
+    req.signal.addEventListener("abort", () => fetchController.abort(), { once: true });
+
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {

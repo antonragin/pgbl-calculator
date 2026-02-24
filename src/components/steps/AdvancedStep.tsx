@@ -31,6 +31,7 @@ export default function AdvancedStep({ inputs, onChange }: Props) {
             Modelar taxas do fundo
           </label>
           <button
+            type="button"
             role="switch"
             aria-checked={inputs.feesEnabled}
             aria-label="Modelar taxas do fundo"

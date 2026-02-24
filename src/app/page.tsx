@@ -44,7 +44,9 @@ export default function HomePage() {
           typeof (s as SavedScenario).result?.derived?.contributionAmount === "number" &&
           typeof (s as SavedScenario).result?.inputs?.annualIncome === "number" &&
           typeof (s as SavedScenario).result?.inputs?.horizonYears === "number" &&
-          Array.isArray((s as SavedScenario).result?.timeseries)
+          Array.isArray((s as SavedScenario).result?.timeseries) &&
+          typeof (s as SavedScenario).result?.terminalA === "number" &&
+          typeof (s as SavedScenario).result?.terminalB === "number"
       );
     } catch { return []; }
   });
@@ -68,6 +70,9 @@ export default function HomePage() {
     },
     []
   );
+
+  const closeChat = useCallback(() => setChatOpen(false), []);
+  const closeCompare = useCallback(() => setCompareOpen(false), []);
 
   const result: SimulationResult = useMemo(
     () => runSimulation(inputs),
@@ -292,14 +297,14 @@ export default function HomePage() {
       {/* Chat panel */}
       <ChatPanel
         isOpen={chatOpen}
-        onClose={() => setChatOpen(false)}
+        onClose={closeChat}
         simulationResult={result}
       />
 
       {/* Compare drawer */}
       <CompareDrawer
         isOpen={compareOpen}
-        onClose={() => setCompareOpen(false)}
+        onClose={closeCompare}
         scenarios={savedScenarios}
         onDelete={handleDeleteScenario}
       />
