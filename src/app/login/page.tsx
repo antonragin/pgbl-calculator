@@ -23,6 +23,7 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (data.success) {
+        setPassword(""); // clear sensitive data from memory
         router.push("/");
         router.refresh();
       } else {

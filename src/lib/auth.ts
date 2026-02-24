@@ -1,6 +1,9 @@
 import { createHmac } from "crypto";
 
-const SIGNING_KEY = process.env.SITE_PASSWORD || "OryxRulezzz2026!";
+// Use a separate secret for cookie signing. Falls back to a derived key
+// so signing key != login password even when using defaults.
+const SIGNING_KEY = process.env.COOKIE_SECRET
+  || `cookie-sign:${process.env.SITE_PASSWORD || "OryxRulezzz2026!"}`;
 
 export const COOKIE_NAME = "pgbl_auth";
 export const MAX_AGE = 60 * 60 * 24 * 7; // 7 days

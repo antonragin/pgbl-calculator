@@ -37,10 +37,25 @@ export async function POST(req: NextRequest) {
   try {
     const { messages, simulationContext } = await req.json();
 
-    // Build context message
+    // Build context message — only include expected numeric/string fields
     let contextMsg = "";
-    if (simulationContext) {
-      contextMsg = `\n\nCONTEXTO DA SIMULACAO ATUAL DO USUARIO:\n${JSON.stringify(simulationContext, null, 2)}`;
+    if (simulationContext && typeof simulationContext === "object") {
+      const allowedKeys = new Set([
+        "renda_anual", "plano", "contribuicao_pct", "regime",
+        "retorno_esperado", "horizonte_anos", "ir_ganhos",
+        "prazo_reembolso", "xin", "xout", "reembolso",
+        "patrimonio_sem_pgbl", "patrimonio_com_pgbl",
+        "delta_bps", "break_even_ano",
+      ]);
+      const filtered: Record<string, unknown> = {};
+      for (const [k, v] of Object.entries(simulationContext)) {
+        if (allowedKeys.has(k) && (typeof v === "number" || typeof v === "string" || v === null)) {
+          filtered[k] = v;
+        }
+      }
+      if (Object.keys(filtered).length > 0) {
+        contextMsg = `\n\nCONTEXTO DA SIMULACAO ATUAL DO USUARIO:\n${JSON.stringify(filtered, null, 2)}`;
+      }
     }
 
     // Only allow user/assistant roles from client to prevent system prompt injection
@@ -131,9 +146,10 @@ export async function POST(req: NextRequest) {
         "Cache-Control": "no-cache",
       },
     });
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Internal error";
     return new Response(
-      JSON.stringify({ error: err.message || "Internal error" }),
+      JSON.stringify({ error: message }),
       { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }

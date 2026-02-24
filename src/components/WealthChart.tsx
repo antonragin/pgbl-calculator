@@ -60,14 +60,13 @@ export default function WealthChart({
 }: Props) {
   const [animationProgress, setAnimationProgress] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [hasAnimated, setHasAnimated] = useState(false);
 
   const maxYear = timeseries.length - 1;
 
   // Auto-play animation on first render / data change
   useEffect(() => {
     setAnimationProgress(0);
-    setHasAnimated(false);
+
     const timer = setTimeout(() => {
       setIsPlaying(true);
     }, 300);
@@ -82,7 +81,7 @@ export default function WealthChart({
         const next = prev + 1;
         if (next >= maxYear) {
           setIsPlaying(false);
-          setHasAnimated(true);
+
           return maxYear;
         }
         return next;
@@ -103,7 +102,7 @@ export default function WealthChart({
 
   function handlePlay() {
     setAnimationProgress(0);
-    setHasAnimated(false);
+
     setTimeout(() => setIsPlaying(true), 100);
   }
 
@@ -226,7 +225,7 @@ export default function WealthChart({
           value={animationProgress}
           onChange={(e) => {
             setIsPlaying(false);
-            setHasAnimated(true);
+  
             setAnimationProgress(Number(e.target.value));
           }}
           className="w-full"

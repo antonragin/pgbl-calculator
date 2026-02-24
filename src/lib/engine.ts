@@ -56,11 +56,13 @@ function wealthB(
     ? fundGrowth - Xout * (fundGrowth - 1)
     : fundGrowth * (1 - Xout);
 
-  const refundHorizon = Math.max(0, N - D);
   let refundComponent: number;
-  if (refundHorizon <= 0) {
-    refundComponent = Xin; // refund received but no growth time
+  if (N < D) {
+    refundComponent = 0; // refund not yet received within this horizon
+  } else if (N === D) {
+    refundComponent = Xin; // refund arrives exactly at horizon, no growth time
   } else {
+    const refundHorizon = N - D;
     const refundGrowth = Math.pow(1 + Yr, refundHorizon);
     refundComponent = Xin * refundGrowth - Z * Xin * (refundGrowth - 1);
   }
@@ -147,12 +149,14 @@ export function runSimulation(inputs: SimulationInputs): SimulationResult {
     const fundNet = isVGBL
       ? fundGrowth - xout * (fundGrowth - 1)
       : fundGrowth * (1 - xout);
-    const refundHorizon = Math.max(0, year - D);
     let refundComp: number;
-    if (refundHorizon <= 0) {
-      refundComp = xin; // matches wealthB unconditionally
+    if (year < D) {
+      refundComp = 0; // refund not yet received
+    } else if (year === D || (year - D) === 0) {
+      refundComp = xin; // refund just arrived, no growth
     } else {
-      const rg = Math.pow(1 + Y, refundHorizon); // refund grows at base Y
+      const rh = year - D;
+      const rg = Math.pow(1 + Y, rh); // refund grows at base Y
       refundComp = xin * rg - Z * xin * (rg - 1);
     }
 
