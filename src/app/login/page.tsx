@@ -73,6 +73,7 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Senha de acesso"
                 className="input-field text-center"
+                autoComplete="off"
                 autoFocus
                 required
               />

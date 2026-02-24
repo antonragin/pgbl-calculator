@@ -123,7 +123,7 @@ export function runSimulation(inputs: SimulationInputs): SimulationResult {
   const Y = inputs.expectedReturn;
   const Z = inputs.capitalGainsTax;
   const D = Math.ceil(inputs.refundDelayYears); // discrete model: refund arrives at start of this year
-  const N = inputs.horizonYears;
+  const N = Math.max(1, Math.round(inputs.horizonYears));
   const isVGBL = inputs.wrapper === "VGBL";
 
   // Fund fees only reduce the PGBL/VGBL fund's return.

@@ -155,7 +155,12 @@ export default function HomePage() {
             </button>
             <button
               onClick={async () => {
-                await fetch("/api/auth", { method: "DELETE" });
+                try {
+                  await fetch("/api/auth", { method: "DELETE" });
+                } catch {
+                  // Clear cookie client-side as fallback
+                  document.cookie = "pgbl_auth=; Max-Age=0; path=/";
+                }
                 window.location.href = "/login";
               }}
               className="rounded-md bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600"

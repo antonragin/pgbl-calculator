@@ -72,6 +72,13 @@ export async function POST(req: NextRequest) {
           .slice(-MAX_MESSAGES)
       : [];
 
+    if (sanitizedMessages.length === 0) {
+      return new Response(
+        JSON.stringify({ error: "Nenhuma mensagem enviada." }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
     const apiMessages = [
       { role: "system", content: SYSTEM_PROMPT + contextMsg },
       ...sanitizedMessages,

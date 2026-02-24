@@ -33,17 +33,16 @@ function renderContent(text: string, isUser: boolean) {
     segments.push({ type: "text", content: text.slice(lastIndex) });
   }
 
-  let keyIdx = 0;
-  return segments.map((seg) => {
+  return segments.map((seg, si) => {
     if (seg.type === "code") {
       return (
-        <pre key={keyIdx++} className="my-1 overflow-x-auto rounded bg-gray-200 p-2 text-xs">
+        <pre key={`seg-${si}`} className="my-1 overflow-x-auto rounded bg-gray-200 p-2 text-xs">
           <code>{seg.content}</code>
         </pre>
       );
     }
     // Split text segments into paragraphs
-    return seg.content.split(/\n\n+/).map((para) => {
+    return seg.content.split(/\n\n+/).map((para, pi) => {
       const trimmed = para.trim();
       if (!trimmed) return null;
       // Inline formatting: **bold**, *italic*, `code`
@@ -56,7 +55,7 @@ function renderContent(text: string, isUser: boolean) {
           return <code key={j} className="rounded bg-gray-200 px-1 text-xs">{s.slice(1, -1)}</code>;
         return s;
       });
-      return <p key={keyIdx++} className={keyIdx > 1 ? "mt-2" : ""}>{parts}</p>;
+      return <p key={`seg-${si}-p-${pi}`} className={si > 0 || pi > 0 ? "mt-2" : ""}>{parts}</p>;
     });
   });
 }
@@ -254,6 +253,7 @@ export default function ChatPanel({
           <div className="flex items-center gap-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-100">
               <svg
+                aria-hidden="true"
                 className="h-4 w-4 text-primary-600"
                 fill="none"
                 viewBox="0 0 24 24"
