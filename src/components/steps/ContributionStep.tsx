@@ -2,7 +2,7 @@
 
 import { SimulationInputs, Wrapper, RedemptionRegime } from "@/lib/types";
 import { formatBRL } from "@/lib/engine";
-import { PGBL_DEDUCTIBLE_CAP } from "@/lib/taxRules";
+import { PGBL_DEDUCTIBLE_CAP, IOF_VGBL_THRESHOLD, IOF_VGBL_RATE } from "@/lib/taxRules";
 
 interface Props {
   inputs: SimulationInputs;
@@ -12,7 +12,11 @@ interface Props {
 export default function ContributionStep({ inputs, onChange }: Props) {
   const maxDeductible = inputs.annualIncome * PGBL_DEDUCTIBLE_CAP;
   const contribution = inputs.annualIncome * inputs.contributionPct;
-  const isOverCap = contribution > maxDeductible;
+  const isPGBL = inputs.wrapper === "PGBL";
+  const isOverCap = isPGBL && inputs.contributionPct > PGBL_DEDUCTIBLE_CAP;
+  const pgblEligible = inputs.filingMode === "complete" && inputs.contributesToINSS;
+  const pgblIneligible = isPGBL && !pgblEligible;
+  const iofApplies = !isPGBL && contribution > IOF_VGBL_THRESHOLD;
 
   return (
     <div className="space-y-6">
@@ -52,10 +56,20 @@ export default function ContributionStep({ inputs, onChange }: Props) {
             </button>
           ))}
         </div>
-        {inputs.wrapper === "VGBL" && (
+        {inputs.wrapper === "VGBL" && pgblEligible && (
+          <p className="mt-2 rounded-md bg-amber-50 p-2 text-xs text-amber-700">
+            PGBL oferece maior vantagem fiscal que VGBL para seu perfil. Use VGBL apenas quando PGBL nao esta disponivel ou ja atingiu o limite de 12%.
+          </p>
+        )}
+        {inputs.wrapper === "VGBL" && !pgblEligible && (
           <p className="mt-2 rounded-md bg-blue-50 p-2 text-xs text-blue-700">
             No VGBL, nao ha deducao do IR (beneficio fiscal = 0). O imposto no
             resgate incide apenas sobre os rendimentos, nao sobre o valor total.
+          </p>
+        )}
+        {pgblIneligible && (
+          <p className="mt-2 rounded-md bg-red-50 p-2 text-xs text-red-700">
+            PGBL nao oferece beneficio fiscal com declaracao simplificada ou sem contribuicao ao INSS. Escolha VGBL ou ajuste seu perfil na etapa anterior.
           </p>
         )}
       </div>
@@ -98,9 +112,18 @@ export default function ContributionStep({ inputs, onChange }: Props) {
           </span>
         </div>
         {isOverCap && (
+          <div className="mt-2 rounded-md bg-red-50 p-2.5 text-xs text-red-700 space-y-1">
+            <p className="font-semibold">
+              O limite dedutivel do PGBL e 12% da renda tributavel ({formatBRL(maxDeductible)}/ano).
+            </p>
+            <p>
+              Reduza a contribuicao para 12% ou escolha VGBL para simular. Dica: voce pode ter dois certificados — PGBL ate 12% e VGBL para o excedente.
+            </p>
+          </div>
+        )}
+        {iofApplies && (
           <p className="mt-2 rounded-md bg-amber-50 p-2 text-xs text-amber-700">
-            O limite dedutivel do PGBL e 12% da renda tributavel (
-            {formatBRL(maxDeductible)}). O excedente nao gera beneficio fiscal.
+            Contribuicoes VGBL acima de {formatBRL(IOF_VGBL_THRESHOLD)}/ano estao sujeitas a IOF de {(IOF_VGBL_RATE * 100).toFixed(0)}% sobre o excedente (Decreto 12.499/2025). IOF estimado: {formatBRL((contribution - IOF_VGBL_THRESHOLD) * IOF_VGBL_RATE)}.
           </p>
         )}
       </div>

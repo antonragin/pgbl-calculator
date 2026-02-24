@@ -52,11 +52,14 @@ export default function AdvancedStep({ inputs, onChange }: Props) {
           <div className="mt-4 space-y-4 rounded-lg border border-gray-200 p-4">
             <div>
               <label className="mb-1 block text-sm text-gray-600">
-                Taxa de administracao (% a.a.)
+                Taxa adicional do fundo previdenciario (% a.a.)
               </label>
+              <p className="mb-2 text-xs text-gray-400">
+                Diferenca entre a taxa do fundo previdenciario e a alternativa sem wrapper (ex: ETF de baixo custo).
+              </p>
               <input
                 type="range"
-                aria-label="Taxa de administracao"
+                aria-label="Taxa adicional do fundo previdenciario"
                 min={0}
                 max={0.03}
                 step={0.001}
@@ -72,7 +75,7 @@ export default function AdvancedStep({ inputs, onChange }: Props) {
             </div>
 
             <div>
-              <label className="mb-1 block text-sm text-gray-600">
+              <label className="mb-1 block text-sm text-gray-600 opacity-50">
                 Taxa de performance (% sobre rendimento)
               </label>
               <input
@@ -81,15 +84,16 @@ export default function AdvancedStep({ inputs, onChange }: Props) {
                 min={0}
                 max={0.25}
                 step={0.01}
-                value={inputs.performanceFeePct}
-                onChange={(e) =>
-                  onChange({ performanceFeePct: Number(e.target.value) })
-                }
-                className="w-full"
+                value={0}
+                disabled
+                className="w-full opacity-40"
               />
-              <div className="mt-0.5 text-right text-sm font-medium text-gray-700">
-                {(inputs.performanceFeePct * 100).toFixed(0)}%
+              <div className="mt-0.5 text-right text-sm font-medium text-gray-400">
+                0%
               </div>
+              <p className="mt-1 text-xs text-gray-400">
+                Recomendamos investir em fundos sem taxa de performance para maximizar o retorno na aposentadoria.
+              </p>
             </div>
           </div>
         )}

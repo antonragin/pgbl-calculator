@@ -2,13 +2,13 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Calculadora PGBL - Descubra sua vantagem tributaria",
+  title: "Calculadora PGBL / VGBL - Descubra sua vantagem tributaria",
   description:
-    "Simule o beneficio fiscal do PGBL e entenda como a deducao no IR pode aumentar seu patrimonio a longo prazo.",
+    "Simule o beneficio fiscal do PGBL e VGBL e entenda como a deducao no IR pode aumentar seu patrimonio a longo prazo.",
   robots: "noindex, nofollow",
   openGraph: {
-    title: "Calculadora PGBL",
-    description: "Simule o beneficio fiscal do PGBL e descubra sua vantagem tributaria.",
+    title: "Calculadora PGBL / VGBL",
+    description: "Simule o beneficio fiscal do PGBL e VGBL e descubra sua vantagem tributaria.",
     type: "website",
     locale: "pt_BR",
   },

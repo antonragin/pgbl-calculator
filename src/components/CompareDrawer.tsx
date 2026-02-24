@@ -142,14 +142,19 @@ export default function CompareDrawer({
                   highlight
                 />
                 <CompareRow
-                  label="Patrimonio sem PGBL"
+                  label="Plano"
+                  scenarioIds={ids}
+                  values={scenarios.map((s) => s.result.inputs.wrapper)}
+                />
+                <CompareRow
+                  label="Patrimonio sem plano"
                   scenarioIds={ids}
                   values={scenarios.map((s) =>
                     formatBRL(s.result.terminalA * s.result.derived.contributionAmount)
                   )}
                 />
                 <CompareRow
-                  label="Patrimonio com PGBL"
+                  label="Patrimonio com plano"
                   scenarioIds={ids}
                   values={scenarios.map((s) =>
                     formatBRL(s.result.terminalB * s.result.derived.contributionAmount)

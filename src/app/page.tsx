@@ -4,6 +4,7 @@ import { useState, useMemo, useCallback, useRef, useEffect } from "react";
 import { SimulationInputs, SimulationResult, SavedScenario, ViewMode } from "@/lib/types";
 import { runSimulation } from "@/lib/engine";
 import { DEFAULT_INPUTS, PRESETS } from "@/lib/defaults";
+import { PGBL_DEDUCTIBLE_CAP } from "@/lib/taxRules";
 import Stepper from "@/components/Stepper";
 import IncomeStep from "@/components/steps/IncomeStep";
 import ContributionStep from "@/components/steps/ContributionStep";
@@ -36,7 +37,6 @@ export default function HomePage() {
       if (!stored) return [];
       const parsed = JSON.parse(stored);
       if (!Array.isArray(parsed)) return [];
-      // Validate each scenario has required shape
       return parsed.filter(
         (s: unknown): s is SavedScenario =>
           typeof s === "object" && s !== null &&
@@ -52,6 +52,37 @@ export default function HomePage() {
   });
   const [toastMsg, setToastMsg] = useState<string | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const suppressPopState = useRef(false);
+
+  // --- Browser history integration ---
+  useEffect(() => {
+    // Set initial history state
+    window.history.replaceState({ view: "inputs", step: 0 }, "");
+
+    const handlePopState = (e: PopStateEvent) => {
+      if (suppressPopState.current) {
+        suppressPopState.current = false;
+        return;
+      }
+      const state = e.state;
+      if (!state) return;
+      if (state.view === "results") {
+        setAppView("results");
+      } else {
+        setAppView("inputs");
+        if (typeof state.step === "number") {
+          setCurrentStep(state.step);
+        }
+      }
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, []);
+
+  function pushHistoryState(view: AppView, step?: number) {
+    window.history.pushState({ view, step: step ?? currentStep }, "");
+  }
 
   // Persist scenarios to localStorage
   useEffect(() => {
@@ -79,13 +110,26 @@ export default function HomePage() {
     [inputs]
   );
 
+  // --- PGBL blocking logic ---
+  const pgblIneligible = inputs.wrapper === "PGBL" &&
+    (inputs.filingMode !== "complete" || !inputs.contributesToINSS);
+  const pgblOverCap = inputs.wrapper === "PGBL" &&
+    inputs.contributionPct > PGBL_DEDUCTIBLE_CAP;
+  const simulationBlocked = inputs.annualIncome === 0 || pgblIneligible || pgblOverCap;
+
+  function handleStepChange(newStep: number) {
+    setCurrentStep(newStep);
+    pushHistoryState("inputs", newStep);
+  }
+
   function handleSimulate() {
     setAppView("results");
+    pushHistoryState("results");
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   function handleBack() {
-    setAppView("inputs");
+    window.history.back();
   }
 
   function showToast(msg: string) {
@@ -134,7 +178,7 @@ export default function HomePage() {
               P
             </div>
             <span className="text-sm font-semibold text-gray-800">
-              Calculadora PGBL
+              Calculadora PGBL / VGBL
             </span>
           </div>
           <div className="flex items-center gap-3">
@@ -152,7 +196,6 @@ export default function HomePage() {
               onClick={() => {
                 setViewMode((v) => {
                   const next = v === "beginner" ? "advanced" : "beginner";
-                  // Clamp step when switching to beginner (max step index = 2)
                   if (next === "beginner") {
                     setCurrentStep((s) => Math.min(s, 2));
                   }
@@ -186,7 +229,7 @@ export default function HomePage() {
             {/* Hero */}
             <div className="text-center">
               <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
-                Descubra quanto o PGBL pode aumentar seu investimento
+                Descubra quanto o PGBL / VGBL pode aumentar seu investimento
               </h1>
               <p className="mt-2 text-sm text-gray-500">
                 Simule em 30 segundos e entenda o impacto do reembolso e da
@@ -219,7 +262,7 @@ export default function HomePage() {
             <Stepper
               steps={visibleSteps}
               currentStep={currentStep}
-              onStepClick={setCurrentStep}
+              onStepClick={handleStepChange}
             />
 
             {/* Step content */}
@@ -241,7 +284,7 @@ export default function HomePage() {
               <div className="mt-6 flex items-center justify-between">
                 <button
                   type="button"
-                  onClick={() => setCurrentStep((s) => Math.max(0, s - 1))}
+                  onClick={() => handleStepChange(Math.max(0, currentStep - 1))}
                   disabled={currentStep === 0}
                   className="btn-secondary px-4 py-2 text-sm disabled:invisible"
                 >
@@ -252,9 +295,10 @@ export default function HomePage() {
                   <button
                     type="button"
                     onClick={() =>
-                      setCurrentStep((s) => Math.min(totalSteps - 1, s + 1))
+                      handleStepChange(Math.min(totalSteps - 1, currentStep + 1))
                     }
-                    className="btn-primary px-6 py-2 text-sm"
+                    disabled={pgblIneligible || pgblOverCap}
+                    className="btn-primary px-6 py-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Proximo
                   </button>
@@ -262,7 +306,7 @@ export default function HomePage() {
                   <button
                     type="button"
                     onClick={handleSimulate}
-                    disabled={inputs.annualIncome === 0}
+                    disabled={simulationBlocked}
                     className="btn-primary px-8 py-2.5 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Simular agora

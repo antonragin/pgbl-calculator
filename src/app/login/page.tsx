@@ -59,7 +59,7 @@ export default function LoginPage() {
           </div>
 
           <h1 className="mb-2 text-xl font-bold text-gray-900">
-            Calculadora PGBL
+            Calculadora PGBL / VGBL
           </h1>
           <p className="mb-6 text-sm text-gray-500">
             Digite a senha para acessar o simulador

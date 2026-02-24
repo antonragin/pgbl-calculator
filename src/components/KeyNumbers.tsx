@@ -14,6 +14,8 @@ export default function KeyNumbers({ result }: Props) {
   const terminalValueB = terminalB * investment;
   const advantage = terminalValueB - terminalValueA;
 
+  const wrapper = inputs.wrapper;
+
   const cards = [
     {
       label: "Reembolso estimado",
@@ -23,21 +25,21 @@ export default function KeyNumbers({ result }: Props) {
       bg: "bg-amber-50",
     },
     {
-      label: "Patrimonio sem PGBL",
+      label: `Patrimonio sem ${wrapper}`,
       value: formatBRL(terminalValueA),
       sub: `Retorno acumulado em ${inputs.horizonYears}a: ${formatPct(terminalA - 1)}`,
       color: "text-gray-600",
       bg: "bg-gray-50",
     },
     {
-      label: "Patrimonio com PGBL",
+      label: `Patrimonio com ${wrapper}`,
       value: formatBRL(terminalValueB),
       sub: `Retorno acumulado em ${inputs.horizonYears}a: ${formatPct(terminalB - 1)}`,
       color: "text-primary-600",
       bg: "bg-primary-50",
     },
     {
-      label: "Vantagem do PGBL",
+      label: `Vantagem do ${wrapper}`,
       value: advantage >= 0 ? `+${formatBRL(advantage)}` : formatBRL(advantage),
       sub: `${formatBps(annualizedDelta)} por ano`,
       color: advantage >= 0 ? "text-accent-600" : "text-red-600",
@@ -47,8 +49,8 @@ export default function KeyNumbers({ result }: Props) {
       label: "Ano de break-even",
       value: breakEvenYear !== null ? `Ano ${breakEvenYear}` : "N/A",
       sub: breakEvenYear !== null
-        ? `PGBL supera a partir do ano ${breakEvenYear}`
-        : "PGBL nao supera neste horizonte",
+        ? `${wrapper} supera a partir do ano ${breakEvenYear}`
+        : `${wrapper} nao supera neste horizonte`,
       color: breakEvenYear !== null ? "text-accent-600" : "text-gray-500",
       bg: breakEvenYear !== null ? "bg-accent-50" : "bg-gray-50",
     },

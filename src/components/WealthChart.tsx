@@ -12,10 +12,9 @@ import {
   AreaChart,
   Legend,
 } from "recharts";
-import { YearlyDataPoint } from "@/lib/types";
+import { YearlyDataPoint, Wrapper } from "@/lib/types";
 
-// Extracted outside component to avoid re-creation on every render
-function ChartTooltip({ active, payload, label }: { active?: boolean; payload?: Array<{ dataKey: string; value: number }>; label?: number }) {
+function ChartTooltip({ active, payload, label, wrapper }: { active?: boolean; payload?: Array<{ dataKey: string; value: number }>; label?: number; wrapper: string }) {
   if (!active || !payload?.length) return null;
   const a = payload.find((p) => p.dataKey === "wealthA");
   const b = payload.find((p) => p.dataKey === "wealthB");
@@ -27,13 +26,13 @@ function ChartTooltip({ active, payload, label }: { active?: boolean; payload?: 
       {a && (
         <p className="text-sm text-gray-600">
           <span className="mr-1.5 inline-block h-2 w-2 rounded-full bg-gray-400" />
-          Sem PGBL: {Number(a.value).toFixed(1)}% do investido
+          Sem {wrapper}: {Number(a.value).toFixed(1)}% do investido
         </p>
       )}
       {b && (
         <p className="text-sm text-primary-700">
           <span className="mr-1.5 inline-block h-2 w-2 rounded-full bg-primary-500" />
-          Com PGBL: {Number(b.value).toFixed(1)}% do investido
+          Com {wrapper}: {Number(b.value).toFixed(1)}% do investido
         </p>
       )}
       {a && b && (
@@ -49,12 +48,14 @@ interface Props {
   timeseries: YearlyDataPoint[];
   breakEvenYear: number | null;
   refundDelayYears: number;
+  wrapper: Wrapper;
 }
 
 export default function WealthChart({
   timeseries,
   breakEvenYear,
   refundDelayYears,
+  wrapper,
 }: Props) {
   const [animationProgress, setAnimationProgress] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -159,12 +160,12 @@ export default function WealthChart({
               tickFormatter={(v) => `${v}%`}
               label={{ value: "% do investido", angle: -90, position: "insideLeft", offset: 10, fontSize: 11, fill: "#9ca3af" }}
             />
-            <Tooltip content={<ChartTooltip />} />
+            <Tooltip content={<ChartTooltip wrapper={wrapper} />} />
             <Legend
               verticalAlign="top"
               height={30}
               formatter={(value: string) =>
-                value === "wealthA" ? "Sem PGBL" : "Com PGBL"
+                value === "wealthA" ? `Sem ${wrapper}` : `Com ${wrapper}`
               }
             />
 

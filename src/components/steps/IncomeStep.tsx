@@ -79,7 +79,10 @@ export default function IncomeStep({ inputs, onChange }: Props) {
               key={mode}
               role="radio"
               aria-checked={inputs.filingMode === mode}
-              onClick={() => onChange({ filingMode: mode })}
+              onClick={() => onChange({
+                filingMode: mode,
+                wrapper: mode === "complete" && inputs.contributesToINSS ? "PGBL" : "VGBL",
+              })}
               className={`flex-1 rounded-lg border-2 p-3 text-left text-sm transition-all ${
                 inputs.filingMode === mode
                   ? "border-primary-500 bg-primary-50"
@@ -117,7 +120,10 @@ export default function IncomeStep({ inputs, onChange }: Props) {
               key={String(v)}
               role="radio"
               aria-checked={inputs.contributesToINSS === v}
-              onClick={() => onChange({ contributesToINSS: v })}
+              onClick={() => onChange({
+                contributesToINSS: v,
+                wrapper: inputs.filingMode === "complete" && v ? "PGBL" : "VGBL",
+              })}
               className={`flex-1 rounded-lg border-2 p-3 text-center text-sm font-medium transition-all ${
                 inputs.contributesToINSS === v
                   ? "border-primary-500 bg-primary-50"
@@ -151,6 +157,17 @@ export default function IncomeStep({ inputs, onChange }: Props) {
           do PGBL gera um reembolso de R${(marginalRate).toFixed(2)}.
         </p>
       </div>
+
+      {/* Auto-select wrapper info */}
+      {inputs.filingMode === "complete" && inputs.contributesToINSS ? (
+        <p className="rounded-md bg-green-50 p-2.5 text-xs text-green-700">
+          Voce pode aproveitar a deducao do PGBL. O plano PGBL foi pre-selecionado para a proxima etapa.
+        </p>
+      ) : (
+        <p className="rounded-md bg-blue-50 p-2.5 text-xs text-blue-700">
+          Para seu perfil, VGBL e a melhor opcao (sem deducao disponivel). O plano VGBL foi pre-selecionado.
+        </p>
+      )}
     </div>
   );
 }

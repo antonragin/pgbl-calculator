@@ -19,9 +19,10 @@ export const DEFAULT_INPUTS: SimulationInputs = {
 export const PRESETS = {
   conservative: {
     label: "Conservador",
-    description: "Retorno moderado, horizonte longo",
+    description: "R$80k, 10% a.a., 15 anos, 6%",
     inputs: {
       ...DEFAULT_INPUTS,
+      annualIncome: 80000,
       expectedReturn: 0.10,
       horizonYears: 15,
       contributionPct: 0.06,
@@ -29,17 +30,22 @@ export const PRESETS = {
   },
   typical: {
     label: "Tipico",
-    description: "Perfil medio de investidor CLT",
-    inputs: { ...DEFAULT_INPUTS },
+    description: "R$120k, 12% a.a., 10 anos, 12%",
+    inputs: {
+      ...DEFAULT_INPUTS,
+      expectedReturn: 0.12,
+    },
   },
   aggressive: {
     label: "Agressivo",
-    description: "Retorno alto, contribuicao maxima",
+    description: "R$300k, 18% a.a., 20 anos, otimista",
     inputs: {
       ...DEFAULT_INPUTS,
-      expectedReturn: 0.20,
+      annualIncome: 300000,
+      expectedReturn: 0.18,
       horizonYears: 20,
       contributionPct: 0.12,
+      regime: "optimistic" as const,
     },
   },
 } as const;

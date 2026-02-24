@@ -25,6 +25,19 @@ export const IRPF_ANNUAL_BRACKETS: TaxBracket[] = [
 // PGBL deductibility cap: 12% of taxable income
 export const PGBL_DEDUCTIBLE_CAP = 0.12;
 
+// IOF on VGBL contributions exceeding R$600k/year (Decreto 12.499/2025, effective 2026)
+export const IOF_VGBL_THRESHOLD = 600_000;
+export const IOF_VGBL_RATE = 0.05;
+
+/**
+ * Compute IOF tax on VGBL annual contributions above the threshold.
+ * Only applies to VGBL — PGBL is exempt.
+ */
+export function computeVGBLIOF(annualContribution: number): number {
+  if (annualContribution <= IOF_VGBL_THRESHOLD) return 0;
+  return (annualContribution - IOF_VGBL_THRESHOLD) * IOF_VGBL_RATE;
+}
+
 // Regressive regime schedule (tabela regressiva de previdencia)
 export interface RegressiveBracket {
   minYears: number;

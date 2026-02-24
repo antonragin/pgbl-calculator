@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
-const SYSTEM_PROMPT = `Voce e um assistente educacional para uma Calculadora de Vantagem Tributaria do PGBL.
+const SYSTEM_PROMPT = `Voce e um assistente educacional para uma Calculadora de Vantagem Tributaria PGBL/VGBL.
 
 REGRAS:
 - Sempre explique conceitos em portugues brasileiro (pt-BR) claro e acessivel.
@@ -15,12 +15,13 @@ REGRAS:
 - Se o usuario escrever em ingles, responda em ingles.
 
 CONCEITOS-CHAVE:
-- PGBL: Plano Gerador de Beneficio Livre. Contribuicoes sao dedutiveis do IR ate 12% da renda tributavel (declaracao completa + contribuicao para INSS).
-- No resgate, o IR incide sobre o valor TOTAL (principal + rendimentos).
-- O beneficio vem do diferimento: o imposto economizado hoje e reinvestido.
-- Tabela regressiva: 35% (0-2 anos) ate 10% (>10 anos).
-- VGBL: sem deducao, IR apenas sobre rendimentos no resgate.
-- A(N,Y,Z) = patrimonio sem PGBL; B(N,Y,Xout,Xin,Z,D) = patrimonio com PGBL + reembolso reinvestido.
+- PGBL: Plano Gerador de Beneficio Livre. Contribuicoes sao dedutiveis do IR ate 12% da renda tributavel (declaracao completa + contribuicao para INSS). No resgate, o IR incide sobre o valor TOTAL (principal + rendimentos). O beneficio vem do diferimento: o imposto economizado hoje e reinvestido.
+- VGBL: Vida Gerador de Beneficio Livre. Sem deducao, IR apenas sobre rendimentos no resgate. Ideal para quem usa declaracao simplificada ou nao contribui para o INSS.
+- Estrategia combinada: investidores podem ter PGBL ate 12% da renda + VGBL para o excedente.
+- Tabela regressiva: 35% (0-2 anos) ate 10% (>10 anos). Lei 14.803/2024: escolha do regime pode ser feita ate o primeiro resgate.
+- IOF VGBL: desde 2026, contribuicoes VGBL acima de R$600k/ano pagam 5% de IOF sobre o excedente (Decreto 12.499/2025).
+- A(N,Y,Z) = patrimonio sem wrapper; B(N,Y,Xout,Xin,Z,D) = patrimonio com wrapper + reembolso reinvestido.
+- Para PGBL: Xin = aliquota marginal (reembolso). Para VGBL: Xin = 0 (sem deducao).
 - Delta anualizado = B^(1/N) - A^(1/N) em pontos-base.`;
 
 export async function POST(req: NextRequest) {

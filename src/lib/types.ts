@@ -25,6 +25,7 @@ export interface DerivedValues {
   deductibleAmount: number;  // R$ amount deductible
   contributionAmount: number;// R$ actual contribution
   refundAmount: number;      // R$ estimated refund
+  iofAmount: number;         // R$ IOF tax on VGBL contributions > R$600k/year
 }
 
 export interface YearlyDataPoint {

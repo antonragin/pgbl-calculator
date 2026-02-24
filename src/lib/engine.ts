@@ -9,6 +9,7 @@ import {
   estimateXout,
   PGBL_DEDUCTIBLE_CAP,
   RULES_VERSION,
+  computeVGBLIOF,
 } from "./taxRules";
 
 export const ENGINE_VERSION = `1.1.0+rules-${RULES_VERSION}`;
@@ -106,12 +107,18 @@ export function deriveValues(inputs: SimulationInputs): DerivedValues {
   const deductibleAmount = Math.min(contributionAmount, maxDeductible);
   const refundAmount = deductibleAmount * xin;
 
+  // IOF on VGBL contributions exceeding R$600k/year (Decreto 12.499/2025)
+  const iofAmount = inputs.wrapper === "VGBL"
+    ? computeVGBLIOF(contributionAmount)
+    : 0;
+
   return {
     xin,
     xout,
     deductibleAmount,
     contributionAmount,
     refundAmount,
+    iofAmount,
   };
 }
 
@@ -138,12 +145,20 @@ export function runSimulation(inputs: SimulationInputs): SimulationResult {
     }
   }
 
+  // IOF reduces the effective contribution entering the VGBL fund.
+  // Express as a fraction of each $1 that actually gets invested.
+  const iofDrag = derived.contributionAmount > 0
+    ? Math.max(0, 1 - derived.iofAmount / derived.contributionAmount)
+    : 1;
+
   const timeseries: YearlyDataPoint[] = [];
   let breakEvenYear: number | null = null;
 
   for (let year = 0; year <= N; year++) {
     const a = wealthA(year, Y, Z);
-    const b = wealthB(year, fundY, Y, xout, xin, Z, D, isVGBL);
+    const rawB = wealthB(year, fundY, Y, xout, xin, Z, D, isVGBL);
+    // IOF reduces the principal that enters the fund (VGBL only)
+    const b = isVGBL ? rawB * iofDrag : rawB;
     const delta = year > 0 ? annualizedDelta(a, b, year) : 0;
 
     // Break down components — must match wealthB() logic exactly.
@@ -166,8 +181,8 @@ export function runSimulation(inputs: SimulationInputs): SimulationResult {
       year,
       wealthA: a,
       wealthB: b,
-      wealthB_pgbl: fundNet,
-      wealthB_refund: refundComp,
+      wealthB_pgbl: isVGBL ? fundNet * iofDrag : fundNet,
+      wealthB_refund: isVGBL ? refundComp * iofDrag : refundComp,
       annualizedDelta: delta,
     });
 
