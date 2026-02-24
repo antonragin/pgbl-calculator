@@ -76,11 +76,15 @@ export default function ChatPanel({
     return () => document.removeEventListener("keydown", handleKey);
   }, [isOpen, onClose]);
 
-  // Cancel in-flight request when panel closes
+  // Cancel in-flight request when panel closes + lock body scroll
   useEffect(() => {
-    if (!isOpen) {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
       abortRef.current?.abort();
     }
+    return () => { document.body.style.overflow = ""; };
   }, [isOpen]);
 
   useEffect(() => {

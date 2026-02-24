@@ -11,7 +11,7 @@ import {
   RULES_VERSION,
 } from "./taxRules";
 
-export const ENGINE_VERSION = `1.0.0+rules-${RULES_VERSION}`;
+export const ENGINE_VERSION = `1.1.0+rules-${RULES_VERSION}`;
 
 /**
  * Taxable (non-PGBL) terminal wealth per $1 invested.
@@ -27,34 +27,45 @@ function wealthA(N: number, Y: number, Z: number): number {
 
 /**
  * PGBL terminal wealth per $1 invested (including refund reinvestment).
- * B(N, Y, Xout, Xin, Z, D) =
- *   (1+Y)^N * (1 - Xout)                          // PGBL growth minus exit tax
- *   + Xin * (1+Y)^(N-D)                            // refund invested outside, gross
- *   - Z * Xin * ((1+Y)^(N-D) - 1)                  // capital gains tax on refund investment
  *
- * If D >= N, the refund has no time to grow, so refund component = Xin (no tax on zero gains).
+ * Yf = fund return (may be fee-reduced for PGBL funds)
+ * Yr = refund reinvestment return (base market return, no fund fees)
+ *
+ * B(N, Yf, Yr, Xout, Xin, Z, D) =
+ *   (1+Yf)^N * (1 - Xout)                         // PGBL growth minus exit tax on full balance
+ *   + Xin * (1+Yr)^(N-D)                           // refund invested outside, gross
+ *   - Z * Xin * ((1+Yr)^(N-D) - 1)                 // capital gains tax on refund gains
+ *
+ * For VGBL: tax at exit applies only to gains, not full balance:
+ *   (1+Yf)^N - Xout * ((1+Yf)^N - 1)
+ *   + Xin * (1+Yr)^(N-D) - Z * Xin * ((1+Yr)^(N-D) - 1)
  */
 function wealthB(
   N: number,
-  Y: number,
+  Yf: number,
+  Yr: number,
   Xout: number,
   Xin: number,
   Z: number,
-  D: number
+  D: number,
+  isVGBL: boolean
 ): number {
-  const pgblGrowth = Math.pow(1 + Y, N);
-  const pgblNet = pgblGrowth * (1 - Xout);
+  const fundGrowth = Math.pow(1 + Yf, N);
+  // PGBL: exit tax on full balance. VGBL: exit tax only on gains.
+  const fundNet = isVGBL
+    ? fundGrowth - Xout * (fundGrowth - 1)
+    : fundGrowth * (1 - Xout);
 
   const refundHorizon = Math.max(0, N - D);
   let refundComponent: number;
   if (refundHorizon <= 0) {
     refundComponent = Xin; // refund received but no growth time
   } else {
-    const refundGrowth = Math.pow(1 + Y, refundHorizon);
+    const refundGrowth = Math.pow(1 + Yr, refundHorizon);
     refundComponent = Xin * refundGrowth - Z * Xin * (refundGrowth - 1);
   }
 
-  return pgblNet + refundComponent;
+  return fundNet + refundComponent;
 }
 
 /**
@@ -110,14 +121,16 @@ export function runSimulation(inputs: SimulationInputs): SimulationResult {
   const Z = inputs.capitalGainsTax;
   const D = inputs.refundDelayYears;
   const N = inputs.horizonYears;
+  const isVGBL = inputs.wrapper === "VGBL";
 
-  // Apply fund fees only to the PGBL path's return.
-  // The non-PGBL comparator (direct investment) uses the raw return Y.
-  let pgblY = Y;
+  // Fund fees only reduce the PGBL/VGBL fund's return.
+  // The refund is reinvested outside the fund at the base market return Y.
+  // The non-PGBL comparator also uses the base return Y.
+  let fundY = Y;
   if (inputs.feesEnabled) {
-    pgblY = Math.max(0, Y - inputs.adminFeePct);
+    fundY = Math.max(0, Y - inputs.adminFeePct);
     if (inputs.performanceFeePct > 0) {
-      pgblY = pgblY * (1 - inputs.performanceFeePct);
+      fundY = fundY * (1 - inputs.performanceFeePct);
     }
   }
 
@@ -126,20 +139,20 @@ export function runSimulation(inputs: SimulationInputs): SimulationResult {
 
   for (let year = 0; year <= N; year++) {
     const a = wealthA(year, Y, Z);
-    const b = wealthB(year, pgblY, xout, xin, Z, D);
+    const b = wealthB(year, fundY, Y, xout, xin, Z, D, isVGBL);
     const delta = year > 0 ? annualizedDelta(a, b, year) : 0;
 
-    // Break down PGBL components — must match wealthB() logic exactly.
-    // In wealthB, refundComponent = Xin when refundHorizon <= 0.
-    // We replicate that here so pgblNet + refundComp === b.
-    const pgblGrowth = Math.pow(1 + pgblY, year);
-    const pgblNet = pgblGrowth * (1 - xout);
+    // Break down components — must match wealthB() logic exactly.
+    const fundGrowth = Math.pow(1 + fundY, year);
+    const fundNet = isVGBL
+      ? fundGrowth - xout * (fundGrowth - 1)
+      : fundGrowth * (1 - xout);
     const refundHorizon = Math.max(0, year - D);
     let refundComp: number;
     if (refundHorizon <= 0) {
       refundComp = xin; // matches wealthB unconditionally
     } else {
-      const rg = Math.pow(1 + pgblY, refundHorizon);
+      const rg = Math.pow(1 + Y, refundHorizon); // refund grows at base Y
       refundComp = xin * rg - Z * xin * (rg - 1);
     }
 
@@ -147,7 +160,7 @@ export function runSimulation(inputs: SimulationInputs): SimulationResult {
       year,
       wealthA: a,
       wealthB: b,
-      wealthB_pgbl: pgblNet,
+      wealthB_pgbl: fundNet,
       wealthB_refund: refundComp,
       annualizedDelta: delta,
     });

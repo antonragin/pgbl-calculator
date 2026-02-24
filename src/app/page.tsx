@@ -127,6 +127,16 @@ export default function HomePage() {
             >
               {isBeginnerMode ? "Modo avancado" : "Modo simples"}
             </button>
+            <button
+              onClick={async () => {
+                await fetch("/api/auth", { method: "DELETE" });
+                window.location.href = "/login";
+              }}
+              className="rounded-md bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600"
+              title="Sair"
+            >
+              Sair
+            </button>
           </div>
         </div>
       </header>

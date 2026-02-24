@@ -17,14 +17,18 @@ export default function CompareDrawer({
   scenarios,
   onDelete,
 }: Props) {
-  // Close on Escape key
+  // Close on Escape key + lock body scroll
   useEffect(() => {
     if (!isOpen) return;
+    document.body.style.overflow = "hidden";
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
     document.addEventListener("keydown", handleKey);
-    return () => document.removeEventListener("keydown", handleKey);
+    return () => {
+      document.body.style.overflow = "";
+      document.removeEventListener("keydown", handleKey);
+    };
   }, [isOpen, onClose]);
 
   if (!isOpen) return null;

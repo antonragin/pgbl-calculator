@@ -49,8 +49,7 @@ export async function middleware(req: NextRequest) {
   if (
     PUBLIC_PATHS.some((p) => pathname.startsWith(p)) ||
     pathname.startsWith("/_next") ||
-    pathname.startsWith("/favicon") ||
-    pathname === "/api/tax-rules"
+    pathname.startsWith("/favicon")
   ) {
     return NextResponse.next();
   }

@@ -45,7 +45,7 @@ export const REGRESSIVE_SCHEDULE: RegressiveBracket[] = [
  * Compute total IRPF on a given annual taxable income.
  */
 export function computeIRPF(annualTaxableIncome: number): number {
-  if (annualTaxableIncome <= 0) return 0;
+  if (!annualTaxableIncome || annualTaxableIncome <= 0) return 0;
   const bracket = IRPF_ANNUAL_BRACKETS.find((b) => annualTaxableIncome <= b.upTo)
     || IRPF_ANNUAL_BRACKETS[IRPF_ANNUAL_BRACKETS.length - 1];
   return Math.max(0, annualTaxableIncome * bracket.rate - bracket.deduction);
@@ -57,7 +57,7 @@ export function computeIRPF(annualTaxableIncome: number): number {
  * from deducting R$1 of PGBL contribution.
  */
 export function estimateMarginalRate(annualTaxableIncome: number): number {
-  if (annualTaxableIncome <= 0) return 0;
+  if (!annualTaxableIncome || annualTaxableIncome <= 0) return 0;
   const bracket = IRPF_ANNUAL_BRACKETS.find((b) => annualTaxableIncome <= b.upTo)
     || IRPF_ANNUAL_BRACKETS[IRPF_ANNUAL_BRACKETS.length - 1];
   return bracket.rate;
