@@ -97,7 +97,7 @@ export default function InvestmentStep({ inputs, onChange }: Props) {
             { value: 0.225, label: "22.5% (curto prazo)" },
           ].map((opt) => (
             <button
-              key={opt.value}
+              key={opt.label}
               onClick={() => onChange({ capitalGainsTax: opt.value })}
               className={`flex-1 rounded-lg border-2 p-3 text-center text-sm transition-all ${
                 inputs.capitalGainsTax === opt.value

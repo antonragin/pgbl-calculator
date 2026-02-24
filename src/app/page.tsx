@@ -30,6 +30,7 @@ export default function HomePage() {
   const [chatOpen, setChatOpen] = useState(false);
   const [compareOpen, setCompareOpen] = useState(false);
   const [savedScenarios, setSavedScenarios] = useState<SavedScenario[]>([]);
+  const [toastMsg, setToastMsg] = useState<string | null>(null);
 
   const handleInputChange = useCallback(
     (partial: Partial<SimulationInputs>) => {
@@ -52,9 +53,15 @@ export default function HomePage() {
     setAppView("inputs");
   }
 
+  function showToast(msg: string) {
+    setToastMsg(msg);
+    setTimeout(() => setToastMsg(null), 3000);
+  }
+
   function handleSaveScenario() {
     if (savedScenarios.length >= 3) {
-      alert("Maximo de 3 cenarios. Remova um antes de salvar outro.");
+      showToast("Maximo de 3 cenarios. Remova um antes de salvar outro.");
+      setCompareOpen(true);
       return;
     }
     const name = `Cenario ${savedScenarios.length + 1}`;
@@ -66,6 +73,7 @@ export default function HomePage() {
     };
     setSavedScenarios((prev) => [...prev, scenario]);
     setCompareOpen(true);
+    showToast("Cenario salvo!");
   }
 
   function handleDeleteScenario(id: string) {
@@ -236,6 +244,13 @@ export default function HomePage() {
         scenarios={savedScenarios}
         onDelete={handleDeleteScenario}
       />
+
+      {/* Toast notification */}
+      {toastMsg && (
+        <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-lg bg-gray-900 px-4 py-2.5 text-sm text-white shadow-lg">
+          {toastMsg}
+        </div>
+      )}
     </div>
   );
 }

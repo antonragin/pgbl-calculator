@@ -67,13 +67,13 @@ export default function WealthChart({
   }, [isPlaying, animationProgress, maxYear]);
 
   const visibleData = useMemo(() => {
-    const endIdx = hasAnimated ? maxYear : animationProgress;
+    const endIdx = animationProgress;
     return timeseries.slice(0, endIdx + 1).map((d) => ({
       ...d,
       wealthA: Number((d.wealthA * 100).toFixed(2)),
       wealthB: Number((d.wealthB * 100).toFixed(2)),
     }));
-  }, [timeseries, animationProgress, hasAnimated, maxYear]);
+  }, [timeseries, animationProgress]);
 
   function handlePlay() {
     setAnimationProgress(0);
@@ -227,7 +227,7 @@ export default function WealthChart({
           min={0}
           max={maxYear}
           step={1}
-          value={hasAnimated ? maxYear : animationProgress}
+          value={animationProgress}
           onChange={(e) => {
             setIsPlaying(false);
             setHasAnimated(true);
@@ -236,7 +236,7 @@ export default function WealthChart({
           className="w-full"
         />
         <span className="min-w-[3rem] text-right text-xs text-gray-400">
-          Ano {hasAnimated ? maxYear : animationProgress}
+          Ano {animationProgress}
         </span>
       </div>
     </div>
