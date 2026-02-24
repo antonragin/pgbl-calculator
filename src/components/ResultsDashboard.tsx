@@ -85,6 +85,20 @@ export default function ResultsDashboard({
         </button>
         {formulasOpen && (
           <div className="mt-4 space-y-4 text-xs text-gray-600">
+            {/* Variable legend */}
+            <div className="rounded bg-blue-50 p-3 text-xs text-gray-600">
+              <p className="mb-1.5 font-semibold text-gray-700">Legenda das variaveis:</p>
+              <ul className="space-y-0.5">
+                <li><span className="font-mono font-semibold">N</span> = horizonte de investimento (anos)</li>
+                <li><span className="font-mono font-semibold">Y</span> = retorno anual esperado (bruto, antes de impostos)</li>
+                <li><span className="font-mono font-semibold">Z</span> = aliquota de IR sobre ganhos do investimento comparativo (sem wrapper)</li>
+                <li><span className="font-mono font-semibold">Yf</span> = retorno do fundo previdenciario (Y menos taxas do fundo, se habilitadas)</li>
+                <li><span className="font-mono font-semibold">Yr</span> = retorno do reembolso reinvestido (= Y, sem taxas de fundo)</li>
+                <li><span className="font-mono font-semibold">Xout(N)</span> = aliquota de saida no resgate, no ano N = min(regressiva(N), progressiva(renda))</li>
+                <li><span className="font-mono font-semibold">Xin</span> = aliquota marginal de IR (percentual do reembolso PGBL; 0 para VGBL)</li>
+                <li><span className="font-mono font-semibold">D</span> = prazo de recebimento do reembolso do IR (em anos)</li>
+              </ul>
+            </div>
             <div>
               <p className="font-semibold text-gray-700">Patrimonio sem {inputs.wrapper} (investimento tributavel):</p>
               <pre className="mt-1 overflow-x-auto rounded bg-gray-100 p-2 font-mono">

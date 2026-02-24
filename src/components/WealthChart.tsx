@@ -36,7 +36,7 @@ function ChartTooltip({ active, payload, label, wrapper }: { active?: boolean; p
         </p>
       )}
       {a && b && (
-        <p className="mt-1 text-xs font-medium text-accent-600">
+        <p className={`mt-1 text-xs font-medium ${Number(b.value) - Number(a.value) >= 0 ? "text-accent-600" : "text-red-600"}`}>
           Diferenca: {(Number(b.value) - Number(a.value)).toFixed(1)} p.p.
         </p>
       )}

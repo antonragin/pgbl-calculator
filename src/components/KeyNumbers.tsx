@@ -54,14 +54,12 @@ export default function KeyNumbers({ result }: Props) {
       color: breakEvenYear !== null ? "text-accent-600" : "text-gray-500",
       bg: breakEvenYear !== null ? "bg-accent-50" : "bg-gray-50",
     },
-    {
-      label: "Retorno extra equivalente",
-      value: `${(annualizedDelta / 100).toFixed(2)}% a.a.`,
-      sub: `Em ${inputs.horizonYears} anos com retorno de ${formatPct(inputs.expectedReturn)} a.a.`,
-      color: annualizedDelta >= 0 ? "text-primary-600" : "text-red-600",
-      bg: "bg-primary-50",
-    },
   ];
+
+  const N = inputs.horizonYears;
+  const annualReturnWith = N > 0 && terminalB > 0 ? (Math.pow(terminalB, 1 / N) - 1) * 100 : 0;
+  const annualReturnWithout = N > 0 && terminalA > 0 ? (Math.pow(terminalA, 1 / N) - 1) * 100 : 0;
+  const annualDiff = annualReturnWith - annualReturnWithout;
 
   return (
     <div>
@@ -81,6 +79,39 @@ export default function KeyNumbers({ result }: Props) {
             <p className="mt-0.5 text-xs text-gray-400">{card.sub}</p>
           </div>
         ))}
+      </div>
+
+      {/* Retorno extra equivalente — special card with 3 large numbers */}
+      <div className="mt-3 rounded-lg bg-primary-50 p-4">
+        <p className="mb-3 text-xs font-semibold text-gray-500">
+          Retorno extra equivalente
+        </p>
+        <div className="grid grid-cols-3 gap-4 text-center">
+          <div>
+            <p className="text-xs text-gray-500">Com {wrapper}</p>
+            <p className="mt-1 text-2xl font-bold text-primary-700">
+              {annualReturnWith.toFixed(2)}%
+            </p>
+            <p className="text-xs text-gray-400">a.a.</p>
+          </div>
+          <div>
+            <p className="text-xs text-gray-500">Sem {wrapper}</p>
+            <p className="mt-1 text-2xl font-bold text-gray-600">
+              {annualReturnWithout.toFixed(2)}%
+            </p>
+            <p className="text-xs text-gray-400">a.a.</p>
+          </div>
+          <div>
+            <p className="text-xs text-gray-500">Diferenca</p>
+            <p className={`mt-1 text-2xl font-bold ${annualDiff >= 0 ? "text-accent-600" : "text-red-600"}`}>
+              {annualDiff >= 0 ? "+" : ""}{annualDiff.toFixed(2)}%
+            </p>
+            <p className="text-xs text-gray-400">a.a.</p>
+          </div>
+        </div>
+        <p className="mt-2 text-center text-xs text-gray-400">
+          Retorno anualizado em {N} anos com premissa de {formatPct(inputs.expectedReturn)} a.a.
+        </p>
       </div>
     </div>
   );

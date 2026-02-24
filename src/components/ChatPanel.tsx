@@ -272,7 +272,7 @@ export default function ChatPanel({
       />
 
       {/* Panel */}
-      <div role="dialog" aria-modal="true" aria-label="Assistente PGBL" className="relative flex h-[85vh] w-full max-w-lg flex-col rounded-t-2xl bg-white shadow-2xl sm:h-[600px] sm:rounded-2xl">
+      <div role="dialog" aria-modal="true" aria-label="Assistente PGBL / VGBL" className="relative flex h-[85vh] w-full max-w-lg flex-col rounded-t-2xl bg-white shadow-2xl sm:h-[600px] sm:rounded-2xl">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-gray-100 px-4 py-3">
           <div className="flex items-center gap-2">
@@ -294,7 +294,7 @@ export default function ChatPanel({
             </div>
             <div>
               <h3 className="text-sm font-semibold text-gray-900">
-                Assistente PGBL
+                Assistente PGBL / VGBL
               </h3>
               <p className="text-xs text-gray-400">Tire suas duvidas</p>
             </div>
