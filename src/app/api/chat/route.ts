@@ -43,9 +43,17 @@ export async function POST(req: NextRequest) {
       contextMsg = `\n\nCONTEXTO DA SIMULACAO ATUAL DO USUARIO:\n${JSON.stringify(simulationContext, null, 2)}`;
     }
 
+    // Only allow user/assistant roles from client to prevent system prompt injection
+    const validRoles = new Set(["user", "assistant"]);
+    const sanitizedMessages = Array.isArray(messages)
+      ? messages
+          .filter((m: any) => validRoles.has(m.role) && typeof m.content === "string")
+          .map((m: any) => ({ role: m.role as string, content: m.content as string }))
+      : [];
+
     const apiMessages = [
       { role: "system", content: SYSTEM_PROMPT + contextMsg },
-      ...messages.map((m: any) => ({ role: m.role, content: m.content })),
+      ...sanitizedMessages,
     ];
 
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -120,7 +128,6 @@ export async function POST(req: NextRequest) {
     return new Response(stream, {
       headers: {
         "Content-Type": "text/plain; charset=utf-8",
-        "Transfer-Encoding": "chunked",
         "Cache-Control": "no-cache",
       },
     });

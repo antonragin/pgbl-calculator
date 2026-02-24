@@ -141,13 +141,10 @@ export default function ContributionStep({ inputs, onChange }: Props) {
             </button>
           ))}
         </div>
-        {inputs.regime === "optimistic" && (
-          <p className="mt-2 rounded-md bg-amber-50 p-2 text-xs text-amber-700">
-            Na pratica, a escolha do regime e feita no momento da adesao ao
-            plano e nao pode ser alterada. Esta opcao e apenas para fins
-            educacionais.
-          </p>
-        )}
+        <p className="mt-2 rounded-md bg-blue-50 p-2 text-xs text-blue-700">
+          Desde a Lei 14.803/2024, a escolha do regime pode ser feita ate o
+          momento do primeiro resgate, e nao mais na adesao ao plano.
+        </p>
       </div>
     </div>
   );

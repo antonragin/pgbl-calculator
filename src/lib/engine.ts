@@ -111,13 +111,13 @@ export function runSimulation(inputs: SimulationInputs): SimulationResult {
   const D = inputs.refundDelayYears;
   const N = inputs.horizonYears;
 
-  // Apply fees by reducing the effective return
-  let effectiveY = Y;
+  // Apply fund fees only to the PGBL path's return.
+  // The non-PGBL comparator (direct investment) uses the raw return Y.
+  let pgblY = Y;
   if (inputs.feesEnabled) {
-    effectiveY = Math.max(0, Y - inputs.adminFeePct);
-    // Performance fee reduces returns proportionally
+    pgblY = Math.max(0, Y - inputs.adminFeePct);
     if (inputs.performanceFeePct > 0) {
-      effectiveY = effectiveY * (1 - inputs.performanceFeePct);
+      pgblY = pgblY * (1 - inputs.performanceFeePct);
     }
   }
 
@@ -125,19 +125,21 @@ export function runSimulation(inputs: SimulationInputs): SimulationResult {
   let breakEvenYear: number | null = null;
 
   for (let year = 0; year <= N; year++) {
-    const a = wealthA(year, effectiveY, Z);
-    const b = wealthB(year, effectiveY, xout, xin, Z, D);
+    const a = wealthA(year, Y, Z);
+    const b = wealthB(year, pgblY, xout, xin, Z, D);
     const delta = year > 0 ? annualizedDelta(a, b, year) : 0;
 
-    // Break down PGBL components
-    const pgblGrowth = Math.pow(1 + effectiveY, year);
+    // Break down PGBL components — must match wealthB() logic exactly.
+    // In wealthB, refundComponent = Xin when refundHorizon <= 0.
+    // We replicate that here so pgblNet + refundComp === b.
+    const pgblGrowth = Math.pow(1 + pgblY, year);
     const pgblNet = pgblGrowth * (1 - xout);
     const refundHorizon = Math.max(0, year - D);
     let refundComp: number;
     if (refundHorizon <= 0) {
-      refundComp = year >= D ? xin : 0;
+      refundComp = xin; // matches wealthB unconditionally
     } else {
-      const rg = Math.pow(1 + effectiveY, refundHorizon);
+      const rg = Math.pow(1 + pgblY, refundHorizon);
       refundComp = xin * rg - Z * xin * (rg - 1);
     }
 
