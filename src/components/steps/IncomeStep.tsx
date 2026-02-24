@@ -57,6 +57,12 @@ export default function IncomeStep({ inputs, onChange }: Props) {
             </button>
           ))}
         </div>
+        {inputs.annualIncome === 0 && (
+          <p className="mt-2 rounded-md bg-red-50 p-2 text-xs text-red-700">
+            Informe uma renda maior que zero para que a simulacao produza
+            resultados significativos.
+          </p>
+        )}
       </div>
 
       {/* Filing mode */}

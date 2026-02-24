@@ -27,6 +27,7 @@ export default function ChatPanel({
   const [isStreaming, setIsStreaming] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const abortRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
     if (isOpen && inputRef.current) {
@@ -34,7 +35,7 @@ export default function ChatPanel({
     }
   }, [isOpen]);
 
-  // Close on Escape key
+  // Abort streaming and close on Escape key
   useEffect(() => {
     if (!isOpen) return;
     const handleKey = (e: KeyboardEvent) => {
@@ -43,6 +44,13 @@ export default function ChatPanel({
     document.addEventListener("keydown", handleKey);
     return () => document.removeEventListener("keydown", handleKey);
   }, [isOpen, onClose]);
+
+  // Cancel in-flight request when panel closes
+  useEffect(() => {
+    if (!isOpen) {
+      abortRef.current?.abort();
+    }
+  }, [isOpen]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({
@@ -103,6 +111,11 @@ export default function ChatPanel({
         content: m.content,
       }));
 
+      // Cancel any previous in-flight request
+      abortRef.current?.abort();
+      const controller = new AbortController();
+      abortRef.current = controller;
+
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -110,14 +123,21 @@ export default function ChatPanel({
           messages: chatHistory,
           simulationContext: buildContext(),
         }),
+        signal: controller.signal,
       });
 
       if (!res.ok) {
-        const err = await res.json();
+        let errorMsg = "Falha na comunicacao";
+        try {
+          const err = await res.json();
+          errorMsg = err.error || errorMsg;
+        } catch {
+          // non-JSON error response (e.g. proxy HTML page)
+        }
         setMessages((prev) =>
           prev.map((m) =>
             m.id === assistantMsg.id
-              ? { ...m, content: `Erro: ${err.error || "Falha na comunicacao"}` }
+              ? { ...m, content: `Erro: ${errorMsg}` }
               : m
           )
         );
@@ -142,7 +162,12 @@ export default function ChatPanel({
           )
         );
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
+      // Don't show error if request was intentionally aborted
+      if (err instanceof DOMException && err.name === "AbortError") {
+        setIsStreaming(false);
+        return;
+      }
       setMessages((prev) =>
         prev.map((m) =>
           m.id === assistantMsg.id
