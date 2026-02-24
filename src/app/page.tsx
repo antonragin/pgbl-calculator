@@ -135,6 +135,7 @@ export default function HomePage() {
           <div className="flex items-center gap-3">
             {savedScenarios.length > 0 && (
               <button
+                type="button"
                 onClick={() => setCompareOpen(true)}
                 className="btn-secondary px-3 py-1.5 text-xs"
               >
@@ -142,6 +143,7 @@ export default function HomePage() {
               </button>
             )}
             <button
+              type="button"
               onClick={() => {
                 setViewMode((v) => {
                   const next = v === "beginner" ? "advanced" : "beginner";
@@ -157,6 +159,7 @@ export default function HomePage() {
               {isBeginnerMode ? "Modo avancado" : "Modo simples"}
             </button>
             <button
+              type="button"
               onClick={async () => {
                 try {
                   await fetch("/api/auth", { method: "DELETE" });
@@ -191,6 +194,7 @@ export default function HomePage() {
               {(Object.entries(PRESETS) as [keyof typeof PRESETS, typeof PRESETS[keyof typeof PRESETS]][]).map(
                 ([key, preset]) => (
                   <button
+                    type="button"
                     key={key}
                     onClick={() => handlePreset(key)}
                     className="rounded-lg border border-gray-200 px-4 py-2 text-center transition-all hover:border-primary-300 hover:bg-primary-50"
@@ -231,6 +235,7 @@ export default function HomePage() {
               {/* Navigation */}
               <div className="mt-6 flex items-center justify-between">
                 <button
+                  type="button"
                   onClick={() => setCurrentStep((s) => Math.max(0, s - 1))}
                   disabled={currentStep === 0}
                   className="btn-secondary px-4 py-2 text-sm disabled:invisible"
@@ -240,6 +245,7 @@ export default function HomePage() {
 
                 {currentStep < totalSteps - 1 ? (
                   <button
+                    type="button"
                     onClick={() =>
                       setCurrentStep((s) => Math.min(totalSteps - 1, s + 1))
                     }
@@ -249,6 +255,7 @@ export default function HomePage() {
                   </button>
                 ) : (
                   <button
+                    type="button"
                     onClick={handleSimulate}
                     disabled={inputs.annualIncome === 0}
                     className="btn-primary px-8 py-2.5 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
@@ -263,6 +270,7 @@ export default function HomePage() {
           <div className="space-y-4">
             {/* Back to inputs */}
             <button
+              type="button"
               onClick={handleBack}
               className="flex items-center gap-1.5 text-sm text-gray-500 transition-colors hover:text-gray-700"
             >
@@ -298,8 +306,16 @@ export default function HomePage() {
 
       {/* Toast notification */}
       {toastMsg && (
-        <div role="status" aria-live="polite" className="fixed bottom-6 left-1/2 z-[60] -translate-x-1/2 rounded-lg bg-gray-900 px-4 py-2.5 text-sm text-white shadow-lg">
-          {toastMsg}
+        <div role="status" aria-live="polite" className="fixed bottom-6 left-1/2 z-[60] -translate-x-1/2 rounded-lg bg-gray-900 px-4 py-2.5 text-sm text-white shadow-lg flex items-center gap-2">
+          <span>{toastMsg}</span>
+          <button
+            type="button"
+            onClick={() => setToastMsg(null)}
+            aria-label="Fechar notificacao"
+            className="text-gray-400 hover:text-white"
+          >
+            &times;
+          </button>
         </div>
       )}
     </div>

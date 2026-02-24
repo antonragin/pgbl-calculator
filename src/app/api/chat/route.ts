@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
 
     // Build context message — only include expected numeric/string fields
     let contextMsg = "";
-    if (simulationContext && typeof simulationContext === "object") {
+    if (simulationContext && typeof simulationContext === "object" && !Array.isArray(simulationContext)) {
       const allowedKeys = new Set([
         "renda_anual", "plano", "contribuicao_pct", "regime",
         "retorno_esperado", "horizonte_anos", "ir_ganhos",
@@ -104,8 +104,10 @@ export async function POST(req: NextRequest) {
     clearTimeout(fetchTimeout);
 
     if (!response.ok) {
-      // Consume the error body to release the connection
+      // Consume the error body to release the connection (with timeout)
+      const errTimeout = setTimeout(() => fetchController.abort(), 5000);
       try { await response.text(); } catch { /* ignore */ }
+      clearTimeout(errTimeout);
       return new Response(
         JSON.stringify({ error: "Erro na comunicacao com o assistente" }),
         { status: 502, headers: { "Content-Type": "application/json" } }

@@ -48,11 +48,11 @@ function renderContent(text: string, isUser: boolean) {
       if (!trimmed) return null;
       // Inline formatting: **bold**, *italic*, `code`
       const parts = trimmed.split(/(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`)/).map((s, j) => {
-        if (s.startsWith("**") && s.endsWith("**"))
+        if (s.startsWith("**") && s.endsWith("**") && s.length > 4)
           return <strong key={j}>{s.slice(2, -2)}</strong>;
-        if (s.startsWith("*") && s.endsWith("*"))
+        if (s.startsWith("*") && s.endsWith("*") && s.length > 2)
           return <em key={j}>{s.slice(1, -1)}</em>;
-        if (s.startsWith("`") && s.endsWith("`"))
+        if (s.startsWith("`") && s.endsWith("`") && s.length > 2)
           return <code key={j} className="rounded bg-gray-200 px-1 text-xs">{s.slice(1, -1)}</code>;
         return s;
       });

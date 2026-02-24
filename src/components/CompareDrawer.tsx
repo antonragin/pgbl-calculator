@@ -67,9 +67,9 @@ export default function CompareDrawer({
             <table className="min-w-[600px] text-sm" aria-label="Comparacao de cenarios salvos">
               <thead>
                 <tr className="border-b border-gray-200 text-left text-xs font-medium uppercase text-gray-400">
-                  <th className="pb-2 pr-4">Metrica</th>
+                  <th scope="col" className="pb-2 pr-4">Metrica</th>
                   {scenarios.map((s) => (
-                    <th key={s.id} className="pb-2 pr-4">
+                    <th scope="col" key={s.id} className="pb-2 pr-4">
                       <div className="flex items-center gap-2">
                         <span className="text-gray-700">{s.name}</span>
                         <button
@@ -203,7 +203,7 @@ function CompareRow({
 }) {
   return (
     <tr>
-      <td className="py-2 pr-4 text-gray-500">{label}</td>
+      <th scope="row" className="py-2 pr-4 text-gray-500 font-normal text-left">{label}</th>
       {values.map((v, i) => (
         <td
           key={scenarioIds[i]}

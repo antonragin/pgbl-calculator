@@ -124,6 +124,7 @@ export default function WealthChart({
           Patrimonio ao longo do tempo (por R$1 investido)
         </h3>
         <button
+          type="button"
           onClick={handlePlay}
           className="flex items-center gap-1.5 rounded-md bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-200"
         >
@@ -170,7 +171,7 @@ export default function WealthChart({
             />
 
             {/* Break-even marker */}
-            {breakEvenYear && (
+            {breakEvenYear !== null && (
               <ReferenceLine
                 x={breakEvenYear}
                 stroke="#22c55e"
