@@ -2,15 +2,16 @@ import { NextRequest, NextResponse } from "next/server";
 
 const COOKIE_NAME = "pgbl_auth";
 const SIGNING_KEY = process.env.SITE_PASSWORD || "OryxRulezzz2026!";
+const MAX_AGE_MS = 60 * 60 * 24 * 7 * 1000; // 7 days in ms
 
 const PUBLIC_PATHS = ["/login", "/api/auth"];
 
-async function verifyHmac(cookieValue: string): Promise<boolean> {
+async function verifyCookie(cookieValue: string): Promise<boolean> {
   const parts = cookieValue.split(".");
   if (parts.length !== 2) return false;
   const [payload, signature] = parts;
 
-  // Use Web Crypto API (available in Edge Runtime)
+  // Verify HMAC signature using Web Crypto API (Edge Runtime compatible)
   const encoder = new TextEncoder();
   const key = await crypto.subtle.importKey(
     "raw",
@@ -30,7 +31,15 @@ async function verifyHmac(cookieValue: string): Promise<boolean> {
   for (let i = 0; i < expected.length; i++) {
     mismatch |= expected.charCodeAt(i) ^ signature.charCodeAt(i);
   }
-  return mismatch === 0;
+  if (mismatch !== 0) return false;
+
+  // Verify timestamp is not expired
+  const tsMatch = payload.match(/:(\d+)$/);
+  if (!tsMatch) return false;
+  const timestamp = Number(tsMatch[1]);
+  if (Date.now() - timestamp > MAX_AGE_MS) return false;
+
+  return true;
 }
 
 export async function middleware(req: NextRequest) {
@@ -47,7 +56,7 @@ export async function middleware(req: NextRequest) {
   }
 
   const cookie = req.cookies.get(COOKIE_NAME);
-  if (cookie?.value && (await verifyHmac(cookie.value))) {
+  if (cookie?.value && (await verifyCookie(cookie.value))) {
     return NextResponse.next();
   }
 

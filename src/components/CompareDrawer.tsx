@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { SavedScenario } from "@/lib/types";
 import { formatBRL, formatPct, formatBps } from "@/lib/engine";
 
@@ -16,6 +17,16 @@ export default function CompareDrawer({
   scenarios,
   onDelete,
 }: Props) {
+  // Close on Escape key
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", handleKey);
+    return () => document.removeEventListener("keydown", handleKey);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   return (
