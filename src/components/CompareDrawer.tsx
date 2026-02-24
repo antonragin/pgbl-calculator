@@ -83,12 +83,17 @@ export default function CompareDrawer({
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
+                {(() => {
+                  const ids = scenarios.map((s) => s.id);
+                  return (<>
                 <CompareRow
                   label="Renda anual"
+                  scenarioIds={ids}
                   values={scenarios.map((s) => formatBRL(s.result.inputs.annualIncome))}
                 />
                 <CompareRow
                   label="Contribuicao"
+                  scenarioIds={ids}
                   values={scenarios.map(
                     (s) =>
                       `${formatPct(s.result.inputs.contributionPct, 0)} (${formatBRL(s.result.derived.contributionAmount)})`
@@ -96,14 +101,17 @@ export default function CompareDrawer({
                 />
                 <CompareRow
                   label="Retorno esperado"
+                  scenarioIds={ids}
                   values={scenarios.map((s) => formatPct(s.result.inputs.expectedReturn))}
                 />
                 <CompareRow
                   label="Horizonte"
+                  scenarioIds={ids}
                   values={scenarios.map((s) => `${s.result.inputs.horizonYears} anos`)}
                 />
                 <CompareRow
                   label="Regime"
+                  scenarioIds={ids}
                   values={scenarios.map((s) =>
                     s.result.inputs.regime === "regressive"
                       ? "Regressivo"
@@ -114,25 +122,30 @@ export default function CompareDrawer({
                 />
                 <CompareRow
                   label="Aliquota entrada (Xin)"
+                  scenarioIds={ids}
                   values={scenarios.map((s) => formatPct(s.result.derived.xin))}
                 />
                 <CompareRow
                   label="Aliquota saida (Xout)"
+                  scenarioIds={ids}
                   values={scenarios.map((s) => formatPct(s.result.derived.xout))}
                 />
                 <CompareRow
                   label="Reembolso"
+                  scenarioIds={ids}
                   values={scenarios.map((s) => formatBRL(s.result.derived.refundAmount))}
                   highlight
                 />
                 <CompareRow
                   label="Patrimonio sem PGBL"
+                  scenarioIds={ids}
                   values={scenarios.map((s) =>
                     formatBRL(s.result.terminalA * s.result.derived.contributionAmount)
                   )}
                 />
                 <CompareRow
                   label="Patrimonio com PGBL"
+                  scenarioIds={ids}
                   values={scenarios.map((s) =>
                     formatBRL(s.result.terminalB * s.result.derived.contributionAmount)
                   )}
@@ -140,6 +153,7 @@ export default function CompareDrawer({
                 />
                 <CompareRow
                   label="Vantagem"
+                  scenarioIds={ids}
                   values={scenarios.map((s) =>
                     formatBRL(
                       (s.result.terminalB - s.result.terminalA) *
@@ -150,17 +164,21 @@ export default function CompareDrawer({
                 />
                 <CompareRow
                   label="Delta anualizado"
+                  scenarioIds={ids}
                   values={scenarios.map((s) => formatBps(s.result.annualizedDelta))}
                   highlight
                 />
                 <CompareRow
                   label="Break-even"
+                  scenarioIds={ids}
                   values={scenarios.map((s) =>
                     s.result.breakEvenYear !== null
                       ? `Ano ${s.result.breakEvenYear}`
                       : "N/A"
                   )}
                 />
+                  </>);
+                })()}
               </tbody>
             </table>
           </div>
@@ -173,10 +191,12 @@ export default function CompareDrawer({
 function CompareRow({
   label,
   values,
+  scenarioIds,
   highlight,
 }: {
   label: string;
   values: string[];
+  scenarioIds: string[];
   highlight?: boolean;
 }) {
   return (
@@ -184,7 +204,7 @@ function CompareRow({
       <td className="py-2 pr-4 text-gray-500">{label}</td>
       {values.map((v, i) => (
         <td
-          key={i}
+          key={scenarioIds[i]}
           className={`py-2 pr-4 ${
             highlight ? "font-semibold text-primary-700" : "text-gray-700"
           }`}

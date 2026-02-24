@@ -121,7 +121,7 @@ export function runSimulation(inputs: SimulationInputs): SimulationResult {
   const { xin, xout } = derived;
   const Y = inputs.expectedReturn;
   const Z = inputs.capitalGainsTax;
-  const D = inputs.refundDelayYears;
+  const D = Math.ceil(inputs.refundDelayYears); // discrete model: refund arrives at start of this year
   const N = inputs.horizonYears;
   const isVGBL = inputs.wrapper === "VGBL";
 

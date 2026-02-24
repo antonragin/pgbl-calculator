@@ -136,6 +136,25 @@ export async function POST(req: NextRequest) {
           }
         }
 
+        // Process any remaining buffer content after stream ends
+        if (buffer.trim()) {
+          const trimmed = buffer.trim();
+          if (trimmed.startsWith("data: ")) {
+            const data = trimmed.slice(6);
+            if (data !== "[DONE]") {
+              try {
+                const parsed = JSON.parse(data);
+                const content = parsed.choices?.[0]?.delta?.content;
+                if (content) {
+                  controller.enqueue(encoder.encode(content));
+                }
+              } catch {
+                // skip invalid JSON
+              }
+            }
+          }
+        }
+
         controller.close();
       },
     });

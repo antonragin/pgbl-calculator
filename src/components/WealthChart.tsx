@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import {
   XAxis,
   YAxis,
@@ -60,6 +60,7 @@ export default function WealthChart({
 }: Props) {
   const [animationProgress, setAnimationProgress] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
+  const playTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const maxYear = timeseries.length - 1;
 
@@ -102,8 +103,8 @@ export default function WealthChart({
 
   function handlePlay() {
     setAnimationProgress(0);
-
-    setTimeout(() => setIsPlaying(true), 100);
+    if (playTimerRef.current) clearTimeout(playTimerRef.current);
+    playTimerRef.current = setTimeout(() => setIsPlaying(true), 100);
   }
 
   return (
