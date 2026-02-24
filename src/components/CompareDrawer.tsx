@@ -74,7 +74,7 @@ export default function CompareDrawer({
                         <button
                           onClick={() => onDelete(s.id)}
                           className="text-gray-300 hover:text-red-500"
-                          title="Remover"
+                          aria-label={`Remover ${s.name}`}
                         >
                           &times;
                         </button>

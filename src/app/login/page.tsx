@@ -43,6 +43,7 @@ export default function LoginPage() {
           {/* Logo / branding */}
           <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary-100">
             <svg
+              aria-hidden="true"
               className="h-8 w-8 text-primary-600"
               fill="none"
               viewBox="0 0 24 24"

@@ -33,7 +33,16 @@ export default function HomePage() {
     if (typeof window === "undefined") return [];
     try {
       const stored = localStorage.getItem("pgbl_scenarios");
-      return stored ? JSON.parse(stored) : [];
+      if (!stored) return [];
+      const parsed = JSON.parse(stored);
+      if (!Array.isArray(parsed)) return [];
+      // Validate each scenario has required shape
+      return parsed.filter(
+        (s: unknown): s is SavedScenario =>
+          typeof s === "object" && s !== null &&
+          "id" in s && "name" in s && "result" in s &&
+          typeof (s as SavedScenario).result?.derived?.contributionAmount === "number"
+      );
     } catch { return []; }
   });
   const [toastMsg, setToastMsg] = useState<string | null>(null);
@@ -251,7 +260,7 @@ export default function HomePage() {
               onClick={handleBack}
               className="flex items-center gap-1.5 text-sm text-gray-500 transition-colors hover:text-gray-700"
             >
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+              <svg aria-hidden="true" className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
               </svg>
               Ajustar premissas

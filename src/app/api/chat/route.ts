@@ -133,8 +133,7 @@ export async function POST(req: NextRequest) {
               if (!trimmed || !trimmed.startsWith("data: ")) continue;
               const data = trimmed.slice(6);
               if (data === "[DONE]") {
-                controller.close();
-                return;
+                return; // finally block will close the controller
               }
 
               try {
