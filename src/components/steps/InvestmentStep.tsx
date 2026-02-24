@@ -27,6 +27,7 @@ export default function InvestmentStep({ inputs, onChange }: Props) {
         </label>
         <input
           type="range"
+          aria-label="Retorno anual esperado"
           min={0.05}
           max={0.25}
           step={0.005}
@@ -54,6 +55,7 @@ export default function InvestmentStep({ inputs, onChange }: Props) {
         </label>
         <input
           type="range"
+          aria-label="Horizonte de investimento em anos"
           min={1}
           max={30}
           step={1}

@@ -65,6 +65,7 @@ export default function ContributionStep({ inputs, onChange }: Props) {
         </label>
         <input
           type="range"
+          aria-label="Percentual da renda para contribuicao"
           min={0.01}
           max={0.20}
           step={0.01}

@@ -71,7 +71,14 @@ function annualizedDelta(a: number, b: number, N: number): number {
  * Derive intermediate values from inputs.
  */
 export function deriveValues(inputs: SimulationInputs): DerivedValues {
-  const xin = estimateMarginalRate(inputs.annualIncome);
+  // PGBL deduction only applies when filing "complete", contributing to INSS,
+  // and using a PGBL wrapper. For VGBL or simplified filing, xin = 0.
+  const pgblDeductible =
+    inputs.filingMode === "complete" &&
+    inputs.contributesToINSS &&
+    inputs.wrapper === "PGBL";
+
+  const xin = pgblDeductible ? estimateMarginalRate(inputs.annualIncome) : 0;
 
   const xout = estimateXout(
     inputs.regime,

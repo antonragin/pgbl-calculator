@@ -14,6 +14,37 @@ import {
 } from "recharts";
 import { YearlyDataPoint } from "@/lib/types";
 
+// Extracted outside component to avoid re-creation on every render
+function ChartTooltip({ active, payload, label }: { active?: boolean; payload?: Array<{ dataKey: string; value: number }>; label?: number }) {
+  if (!active || !payload?.length) return null;
+  const a = payload.find((p) => p.dataKey === "wealthA");
+  const b = payload.find((p) => p.dataKey === "wealthB");
+  return (
+    <div className="rounded-lg border border-gray-200 bg-white p-3 shadow-lg">
+      <p className="mb-1 text-xs font-semibold text-gray-500">
+        Ano {label}
+      </p>
+      {a && (
+        <p className="text-sm text-gray-600">
+          <span className="mr-1.5 inline-block h-2 w-2 rounded-full bg-gray-400" />
+          Sem PGBL: {a.value.toFixed(1)}% do investido
+        </p>
+      )}
+      {b && (
+        <p className="text-sm text-primary-700">
+          <span className="mr-1.5 inline-block h-2 w-2 rounded-full bg-primary-500" />
+          Com PGBL: {b.value.toFixed(1)}% do investido
+        </p>
+      )}
+      {a && b && (
+        <p className="mt-1 text-xs font-medium text-accent-600">
+          Diferenca: {(b.value - a.value).toFixed(1)} p.p.
+        </p>
+      )}
+    </div>
+  );
+}
+
 interface Props {
   timeseries: YearlyDataPoint[];
   breakEvenYear: number | null;
@@ -81,37 +112,6 @@ export default function WealthChart({
     setTimeout(() => setIsPlaying(true), 100);
   }
 
-  // Custom tooltip
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (!active || !payload?.length) return null;
-    const a = payload.find((p: any) => p.dataKey === "wealthA");
-    const b = payload.find((p: any) => p.dataKey === "wealthB");
-    return (
-      <div className="rounded-lg border border-gray-200 bg-white p-3 shadow-lg">
-        <p className="mb-1 text-xs font-semibold text-gray-500">
-          Ano {label}
-        </p>
-        {a && (
-          <p className="text-sm text-gray-600">
-            <span className="mr-1.5 inline-block h-2 w-2 rounded-full bg-gray-400" />
-            Sem PGBL: {a.value.toFixed(1)}% do investido
-          </p>
-        )}
-        {b && (
-          <p className="text-sm text-primary-700">
-            <span className="mr-1.5 inline-block h-2 w-2 rounded-full bg-primary-500" />
-            Com PGBL: {b.value.toFixed(1)}% do investido
-          </p>
-        )}
-        {a && b && (
-          <p className="mt-1 text-xs font-medium text-accent-600">
-            Diferenca: {(b.value - a.value).toFixed(1)} p.p.
-          </p>
-        )}
-      </div>
-    );
-  };
-
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
@@ -155,7 +155,7 @@ export default function WealthChart({
               tickFormatter={(v) => `${v}%`}
               label={{ value: "% do investido", angle: -90, position: "insideLeft", offset: 10, fontSize: 11, fill: "#9ca3af" }}
             />
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip content={<ChartTooltip />} />
             <Legend
               verticalAlign="top"
               height={30}
@@ -224,6 +224,7 @@ export default function WealthChart({
       <div className="flex items-center gap-3">
         <input
           type="range"
+          aria-label="Ano da simulacao"
           min={0}
           max={maxYear}
           step={1}

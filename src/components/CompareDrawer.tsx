@@ -25,7 +25,7 @@ export default function CompareDrawer({
         onClick={onClose}
       />
 
-      <div className="relative max-h-[85vh] w-full max-w-3xl overflow-auto rounded-t-2xl bg-white p-6 shadow-2xl sm:rounded-2xl">
+      <div role="dialog" aria-modal="true" aria-label="Comparar cenarios" className="relative max-h-[85vh] w-full max-w-3xl overflow-auto rounded-t-2xl bg-white p-6 shadow-2xl sm:rounded-2xl">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-gray-900">
             Comparar cenarios ({scenarios.length}/3)

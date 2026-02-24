@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
+import { COOKIE_NAME, MAX_AGE, createAuthCookie } from "@/lib/auth";
 
 const SITE_PASSWORD = process.env.SITE_PASSWORD || "OryxRulezzz2026!";
-const COOKIE_NAME = "pgbl_auth";
-const COOKIE_VALUE = "authenticated";
-const MAX_AGE = 60 * 60 * 24 * 7; // 7 days
 
 export async function POST(req: NextRequest) {
   try {
@@ -12,7 +10,7 @@ export async function POST(req: NextRequest) {
 
     if (password === SITE_PASSWORD) {
       const response = NextResponse.json({ success: true });
-      response.cookies.set(COOKIE_NAME, COOKIE_VALUE, {
+      response.cookies.set(COOKIE_NAME, createAuthCookie(), {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",

@@ -156,7 +156,7 @@ export default function ChatPanel({
       />
 
       {/* Panel */}
-      <div className="relative flex h-[85vh] w-full max-w-lg flex-col rounded-t-2xl bg-white shadow-2xl sm:h-[600px] sm:rounded-2xl">
+      <div role="dialog" aria-modal="true" aria-label="Assistente PGBL" className="relative flex h-[85vh] w-full max-w-lg flex-col rounded-t-2xl bg-white shadow-2xl sm:h-[600px] sm:rounded-2xl">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-gray-100 px-4 py-3">
           <div className="flex items-center gap-2">

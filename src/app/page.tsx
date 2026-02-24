@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useRef } from "react";
 import { SimulationInputs, SimulationResult, SavedScenario, ViewMode } from "@/lib/types";
 import { runSimulation } from "@/lib/engine";
 import { DEFAULT_INPUTS, PRESETS } from "@/lib/defaults";
@@ -31,6 +31,7 @@ export default function HomePage() {
   const [compareOpen, setCompareOpen] = useState(false);
   const [savedScenarios, setSavedScenarios] = useState<SavedScenario[]>([]);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleInputChange = useCallback(
     (partial: Partial<SimulationInputs>) => {
@@ -54,8 +55,9 @@ export default function HomePage() {
   }
 
   function showToast(msg: string) {
+    if (toastTimer.current) clearTimeout(toastTimer.current);
     setToastMsg(msg);
-    setTimeout(() => setToastMsg(null), 3000);
+    toastTimer.current = setTimeout(() => setToastMsg(null), 3000);
   }
 
   function handleSaveScenario() {
@@ -111,9 +113,16 @@ export default function HomePage() {
               </button>
             )}
             <button
-              onClick={() =>
-                setViewMode((v) => (v === "beginner" ? "advanced" : "beginner"))
-              }
+              onClick={() => {
+                setViewMode((v) => {
+                  const next = v === "beginner" ? "advanced" : "beginner";
+                  // Clamp step when switching to beginner (max step index = 2)
+                  if (next === "beginner") {
+                    setCurrentStep((s) => Math.min(s, 2));
+                  }
+                  return next;
+                });
+              }}
               className="rounded-md bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-200"
             >
               {isBeginnerMode ? "Modo avancado" : "Modo simples"}
@@ -137,7 +146,7 @@ export default function HomePage() {
             </div>
 
             {/* Presets */}
-            <div className="flex justify-center gap-3">
+            <div className="flex flex-wrap justify-center gap-3">
               {(Object.entries(PRESETS) as [keyof typeof PRESETS, typeof PRESETS[keyof typeof PRESETS]][]).map(
                 ([key, preset]) => (
                   <button
@@ -247,7 +256,7 @@ export default function HomePage() {
 
       {/* Toast notification */}
       {toastMsg && (
-        <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-lg bg-gray-900 px-4 py-2.5 text-sm text-white shadow-lg">
+        <div role="status" aria-live="polite" className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-lg bg-gray-900 px-4 py-2.5 text-sm text-white shadow-lg">
           {toastMsg}
         </div>
       )}

@@ -32,6 +32,9 @@ export default function AdvancedStep({ inputs, onChange }: Props) {
             Modelar taxas do fundo
           </label>
           <button
+            role="switch"
+            aria-checked={inputs.feesEnabled}
+            aria-label="Modelar taxas do fundo"
             onClick={() => onChange({ feesEnabled: !inputs.feesEnabled })}
             className={`relative h-6 w-11 rounded-full transition-colors ${
               inputs.feesEnabled ? "bg-primary-600" : "bg-gray-300"
@@ -53,6 +56,7 @@ export default function AdvancedStep({ inputs, onChange }: Props) {
               </label>
               <input
                 type="range"
+                aria-label="Taxa de administracao"
                 min={0}
                 max={0.03}
                 step={0.001}
@@ -73,6 +77,7 @@ export default function AdvancedStep({ inputs, onChange }: Props) {
               </label>
               <input
                 type="range"
+                aria-label="Taxa de performance"
                 min={0}
                 max={0.25}
                 step={0.01}
