@@ -109,7 +109,7 @@ export default function AdvancedStep({ inputs, onChange }: Props) {
           <Row label="Declaracao" value={inputs.filingMode === "complete" ? "Completa" : "Simplificada"} />
           <Row label="Plano" value={inputs.wrapper} />
           <Row label="Contribuicao" value={`${formatPct(inputs.contributionPct, 0)} = ${formatBRL(derived.contributionAmount)}/ano`} />
-          <Row label="Regime resgate" value={inputs.regime === "regressive" ? "Regressivo" : inputs.regime === "progressive" ? "Progressivo" : "Otimista"} />
+          <Row label="Regime resgate" value="Melhor entre Prog. e Reg." />
           <Row label="Aliquota entrada (Xin)" value={formatPct(derived.xin)} />
           <Row label="Aliquota saida (Xout)" value={formatPct(derived.xout)} />
           <Row label="Retorno esperado" value={formatPct(inputs.expectedReturn)} />

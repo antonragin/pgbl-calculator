@@ -88,6 +88,7 @@ export function getRegressiveRate(holdingYears: number): number {
 
 /**
  * Estimate Xout (tax at redemption) based on regime and horizon.
+ * @deprecated Use computeBestXout() instead — engine now always uses "best of" logic.
  */
 export function estimateXout(
   regime: "progressive" | "regressive" | "optimistic",
@@ -104,4 +105,14 @@ export function estimateXout(
       // Best case: regressive minimum (10% after 10 years)
       return 0.10;
   }
+}
+
+/**
+ * Compute the "best of" tax rate for a given year.
+ * Returns min(regressive_rate(year), progressive_marginal_rate(income)).
+ * Models investor tax optionality: can choose regime at redemption (Lei 14.803/2024)
+ * and can hold multiple certificates to optimize per-certificate.
+ */
+export function computeBestXout(year: number, annualIncome: number): number {
+  return Math.min(getRegressiveRate(year), estimateMarginalRate(annualIncome));
 }

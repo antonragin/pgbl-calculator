@@ -48,6 +48,7 @@ export default function ResultsDashboard({
           breakEvenYear={result.breakEvenYear}
           refundDelayYears={inputs.refundDelayYears}
           wrapper={inputs.wrapper}
+          terminalAdvantagePositive={terminalB >= terminalA}
         />
       </div>
 
@@ -97,18 +98,32 @@ A = ${terminalA.toFixed(4)}`}
               <p className="font-semibold text-gray-700">Patrimonio com {inputs.wrapper}:</p>
               <pre className="mt-1 overflow-x-auto rounded bg-gray-100 p-2 font-mono">
 {isVGBL
-  ? `B = (1+Yf)^N - Xout * ((1+Yf)^N - 1)
-    + Xin * (1+Yr)^(N-D) - Z * Xin * ((1+Yr)^(N-D) - 1)
+  ? `B(N) = (1+Yf)^N - Xout(N) * ((1+Yf)^N - 1)${derived.iofAmount > 0 ? ` * iofDrag` : ''}
 
 VGBL: imposto no resgate incide apenas sobre ganhos.
-Xin=${(derived.xin * 100).toFixed(1)}% (sem deducao para VGBL)`
-  : `B = (1+Yf)^N * (1 - Xout)
-    + Xin * (1+Yr)^(N-D) - Z * Xin * ((1+Yr)^(N-D) - 1)
+Xout(N) = min(regressivo(N), progressivo) = melhor taxa.${derived.iofAmount > 0 ? `
+iofDrag = 1 - IOF/contribuicao = ${(1 - derived.iofAmount / derived.contributionAmount).toFixed(4)}
+IOF = ${formatBRL(derived.iofAmount)} (5% sobre excedente de ${formatBRL(600000)}/ano)` : ''}`
+  : `B(N) = (1+Yf)^N * (1 - Xout(N))
+       + Xin * (1+Yr)^(N-D) - Z * Xin * ((1+Yr)^(N-D) - 1)
 
-PGBL: imposto no resgate incide sobre o saldo total.`}
-{`
-Valores: Xin=${(derived.xin * 100).toFixed(1)}%, Xout=${(derived.xout * 100).toFixed(1)}%, D=${inputs.refundDelayYears}a
+PGBL: imposto no resgate incide sobre o saldo total.
+Xout(N) = min(regressivo(N), progressivo) = melhor taxa.`}
+{isVGBL
+  ? `
+Valores: Xout(${inputs.horizonYears})=${(derived.xout * 100).toFixed(1)}%
+B = ${terminalB.toFixed(4)}`
+  : `
+Valores: Xin=${(derived.xin * 100).toFixed(1)}%, Xout(${inputs.horizonYears})=${(derived.xout * 100).toFixed(1)}%, D=${inputs.refundDelayYears}a
 B = ${terminalB.toFixed(4)}`}
+              </pre>
+            </div>
+            <div>
+              <p className="font-semibold text-gray-700">Regime de tributacao:</p>
+              <pre className="mt-1 overflow-x-auto rounded bg-gray-100 p-2 font-mono">
+{`Xout(N) = min(regressivo(N), progressivo(renda))
+Para cada ano, usa a menor aliquota entre os regimes.
+Grafico mostra "como se resgatasse no ano N".`}
               </pre>
             </div>
             <div>

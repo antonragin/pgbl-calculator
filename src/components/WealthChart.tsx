@@ -49,6 +49,7 @@ interface Props {
   breakEvenYear: number | null;
   refundDelayYears: number;
   wrapper: Wrapper;
+  terminalAdvantagePositive: boolean;
 }
 
 export default function WealthChart({
@@ -56,6 +57,7 @@ export default function WealthChart({
   breakEvenYear,
   refundDelayYears,
   wrapper,
+  terminalAdvantagePositive,
 }: Props) {
   const [animationProgress, setAnimationProgress] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -169,24 +171,24 @@ export default function WealthChart({
               }
             />
 
-            {/* Break-even marker */}
+            {/* Break-even marker — green when terminal advantage is positive, red otherwise */}
             {breakEvenYear !== null && (
               <ReferenceLine
                 x={breakEvenYear}
-                stroke="#22c55e"
+                stroke={terminalAdvantagePositive ? "#22c55e" : "#ef4444"}
                 strokeDasharray="5 5"
                 strokeWidth={2}
                 label={{
                   value: `Break-even: Ano ${breakEvenYear}`,
                   position: "top",
                   fontSize: 11,
-                  fill: "#16a34a",
+                  fill: terminalAdvantagePositive ? "#16a34a" : "#dc2626",
                 }}
               />
             )}
 
-            {/* Refund arrival marker */}
-            {refundDelayYears <= maxYear && (
+            {/* Refund arrival marker — only for PGBL (VGBL has no refund) */}
+            {wrapper !== "VGBL" && refundDelayYears <= maxYear && (
               <ReferenceLine
                 x={Math.ceil(refundDelayYears)}
                 stroke="#f59e0b"

@@ -126,32 +126,46 @@ export default function InvestmentStep({ inputs, onChange }: Props) {
         <label className="mb-1.5 block text-sm font-medium text-gray-700">
           Prazo de recebimento do reembolso do IR
         </label>
-        <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Prazo de recebimento do reembolso do IR">
-          {[
-            { value: 0.5, label: "6 meses (mai/jun)" },
-            { value: 0.75, label: "9 meses (set)" },
-            { value: 1.0, label: "12 meses (tarde)" },
-          ].map((opt) => (
-            <button
-              type="button"
-              key={opt.value}
-              role="radio"
-              aria-checked={inputs.refundDelayYears === opt.value}
-              onClick={() => onChange({ refundDelayYears: opt.value })}
-              className={`flex-1 rounded-lg border-2 p-2.5 text-center text-xs transition-all sm:text-sm ${
-                inputs.refundDelayYears === opt.value
-                  ? "border-primary-500 bg-primary-50 font-medium"
-                  : "border-gray-200 hover:border-gray-300"
-              }`}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
-        <p className="mt-1 text-xs text-gray-400">
-          O reembolso do IR normalmente chega meses depois da contribuicao.
-          Aqui estimamos quando esse dinheiro comeca a render.
-        </p>
+        {inputs.wrapper === "VGBL" ? (
+          <div className="rounded-lg border-2 border-gray-200 bg-gray-50 p-3">
+            <p className="text-sm text-gray-400">
+              Nao aplicavel para VGBL
+            </p>
+            <p className="mt-1 text-xs text-gray-400">
+              O VGBL nao gera reembolso de IR, pois nao ha deducao fiscal
+              na contribuicao.
+            </p>
+          </div>
+        ) : (
+          <>
+            <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Prazo de recebimento do reembolso do IR">
+              {[
+                { value: 0.5, label: "6 meses (mai/jun)" },
+                { value: 0.75, label: "9 meses (set)" },
+                { value: 1.0, label: "12 meses (tarde)" },
+              ].map((opt) => (
+                <button
+                  type="button"
+                  key={opt.value}
+                  role="radio"
+                  aria-checked={inputs.refundDelayYears === opt.value}
+                  onClick={() => onChange({ refundDelayYears: opt.value })}
+                  className={`flex-1 rounded-lg border-2 p-2.5 text-center text-xs transition-all sm:text-sm ${
+                    inputs.refundDelayYears === opt.value
+                      ? "border-primary-500 bg-primary-50 font-medium"
+                      : "border-gray-200 hover:border-gray-300"
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+            <p className="mt-1 text-xs text-gray-400">
+              O reembolso do IR normalmente chega meses depois da contribuicao.
+              Aqui estimamos quando esse dinheiro comeca a render.
+            </p>
+          </>
+        )}
       </div>
     </div>
   );

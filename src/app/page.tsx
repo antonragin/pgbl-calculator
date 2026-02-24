@@ -3,7 +3,7 @@
 import { useState, useMemo, useCallback, useRef, useEffect } from "react";
 import { SimulationInputs, SimulationResult, SavedScenario, ViewMode } from "@/lib/types";
 import { runSimulation } from "@/lib/engine";
-import { DEFAULT_INPUTS, PRESETS } from "@/lib/defaults";
+import { DEFAULT_INPUTS } from "@/lib/defaults";
 import { PGBL_DEDUCTIBLE_CAP } from "@/lib/taxRules";
 import Stepper from "@/components/Stepper";
 import IncomeStep from "@/components/steps/IncomeStep";
@@ -160,10 +160,6 @@ export default function HomePage() {
     setSavedScenarios((prev) => prev.filter((s) => s.id !== id));
   }
 
-  function handlePreset(key: keyof typeof PRESETS) {
-    setInputs(PRESETS[key].inputs);
-  }
-
   const isBeginnerMode = viewMode === "beginner";
   const totalSteps = isBeginnerMode ? 3 : 4;
   const visibleSteps = isBeginnerMode ? STEPS.slice(0, 3) : STEPS;
@@ -237,27 +233,6 @@ export default function HomePage() {
               </p>
             </div>
 
-            {/* Presets */}
-            <div className="flex flex-wrap justify-center gap-3">
-              {(Object.entries(PRESETS) as [keyof typeof PRESETS, typeof PRESETS[keyof typeof PRESETS]][]).map(
-                ([key, preset]) => (
-                  <button
-                    type="button"
-                    key={key}
-                    onClick={() => handlePreset(key)}
-                    className="rounded-lg border border-gray-200 px-4 py-2 text-center transition-all hover:border-primary-300 hover:bg-primary-50"
-                  >
-                    <span className="block text-sm font-medium text-gray-700">
-                      {preset.label}
-                    </span>
-                    <span className="block text-xs text-gray-400">
-                      {preset.description}
-                    </span>
-                  </button>
-                )
-              )}
-            </div>
-
             {/* Stepper */}
             <Stepper
               steps={visibleSteps}
@@ -297,7 +272,7 @@ export default function HomePage() {
                     onClick={() =>
                       handleStepChange(Math.min(totalSteps - 1, currentStep + 1))
                     }
-                    disabled={pgblIneligible || pgblOverCap}
+                    disabled={currentStep >= 1 && (pgblIneligible || pgblOverCap)}
                     className="btn-primary px-6 py-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Proximo

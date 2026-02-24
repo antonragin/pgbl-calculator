@@ -1,6 +1,6 @@
 "use client";
 
-import { SimulationInputs, Wrapper, RedemptionRegime } from "@/lib/types";
+import { SimulationInputs, Wrapper } from "@/lib/types";
 import { formatBRL } from "@/lib/engine";
 import { PGBL_DEDUCTIBLE_CAP, IOF_VGBL_THRESHOLD, IOF_VGBL_RATE } from "@/lib/taxRules";
 
@@ -128,52 +128,23 @@ export default function ContributionStep({ inputs, onChange }: Props) {
         )}
       </div>
 
-      {/* Regime */}
+      {/* Regime — always "Best of Progressive and Regressive" */}
       <div>
         <label className="mb-1.5 block text-sm font-medium text-gray-700">
           Regime de tributacao no resgate
         </label>
-        <div className="space-y-2" role="radiogroup" aria-label="Regime de tributacao no resgate">
-          {(
-            [
-              {
-                value: "regressive" as RedemptionRegime,
-                label: "Regressivo",
-                desc: "Aliquota diminui com o tempo (35% a 10%)",
-              },
-              {
-                value: "progressive" as RedemptionRegime,
-                label: "Progressivo",
-                desc: "Tabela do IR (0% a 27.5%)",
-              },
-              {
-                value: "optimistic" as RedemptionRegime,
-                label: "Otimista (minimo)",
-                desc: "Assume a menor aliquota possivel (10%)",
-              },
-            ]
-          ).map((opt) => (
-            <button
-              type="button"
-              key={opt.value}
-              role="radio"
-              aria-checked={inputs.regime === opt.value}
-              onClick={() => onChange({ regime: opt.value })}
-              className={`w-full rounded-lg border-2 p-3 text-left text-sm transition-all ${
-                inputs.regime === opt.value
-                  ? "border-primary-500 bg-primary-50"
-                  : "border-gray-200 hover:border-gray-300"
-              }`}
-            >
-              <span className="font-medium">{opt.label}</span>
-              <p className="text-xs text-gray-500">{opt.desc}</p>
-            </button>
-          ))}
+        <div className="rounded-lg border-2 border-primary-500 bg-primary-50 p-3">
+          <span className="text-sm font-semibold text-primary-700">
+            Melhor entre Progressivo e Regressivo
+          </span>
+          <p className="mt-1 text-xs text-gray-600">
+            Para cada ano, a simulacao usa a menor aliquota entre o regime
+            progressivo e o regressivo. Desde a Lei 14.803/2024, o investidor
+            pode escolher o regime antes do primeiro resgate e pode ter multiplos
+            certificados — efetivamente estruturando a opcionalidade tributaria
+            no momento do resgate.
+          </p>
         </div>
-        <p className="mt-2 rounded-md bg-blue-50 p-2 text-xs text-blue-700">
-          Desde a Lei 14.803/2024, a escolha do regime pode ser feita ate o
-          momento do primeiro resgate, e nao mais na adesao ao plano.
-        </p>
       </div>
     </div>
   );

@@ -6,7 +6,7 @@ import {
 } from "./types";
 import {
   estimateMarginalRate,
-  estimateXout,
+  computeBestXout,
   PGBL_DEDUCTIBLE_CAP,
   RULES_VERSION,
   computeVGBLIOF,
@@ -95,11 +95,9 @@ export function deriveValues(inputs: SimulationInputs): DerivedValues {
 
   const xin = pgblDeductible ? estimateMarginalRate(inputs.annualIncome) : 0;
 
-  const xout = estimateXout(
-    inputs.regime,
-    inputs.horizonYears,
-    inputs.annualIncome
-  );
+  // Terminal year's "best of" rate — for display in summary cards.
+  // Engine always uses per-year Xout in the simulation loop.
+  const xout = computeBestXout(inputs.horizonYears, inputs.annualIncome);
 
   const maxDeductible = inputs.annualIncome * PGBL_DEDUCTIBLE_CAP;
   const contributionPct = Math.max(0, Math.min(1, inputs.contributionPct));
@@ -127,7 +125,7 @@ export function deriveValues(inputs: SimulationInputs): DerivedValues {
  */
 export function runSimulation(inputs: SimulationInputs): SimulationResult {
   const derived = deriveValues(inputs);
-  const { xin, xout } = derived;
+  const { xin } = derived;
   const Y = inputs.expectedReturn;
   const Z = inputs.capitalGainsTax;
   const D = Math.ceil(inputs.refundDelayYears); // discrete model: refund arrives at start of this year
@@ -155,17 +153,20 @@ export function runSimulation(inputs: SimulationInputs): SimulationResult {
   let breakEvenYear: number | null = null;
 
   for (let year = 0; year <= N; year++) {
+    // Per-year Xout: "as if redeemed at this year" using best of progressive/regressive
+    const yearXout = computeBestXout(year, inputs.annualIncome);
+
     const a = wealthA(year, Y, Z);
-    const rawB = wealthB(year, fundY, Y, xout, xin, Z, D, isVGBL);
+    const rawB = wealthB(year, fundY, Y, yearXout, xin, Z, D, isVGBL);
     // IOF reduces the principal that enters the fund (VGBL only)
     const b = isVGBL ? rawB * iofDrag : rawB;
     const delta = year > 0 ? annualizedDelta(a, b, year) : 0;
 
-    // Break down components — must match wealthB() logic exactly.
+    // Break down components — must match wealthB() logic with yearXout.
     const fundGrowth = Math.pow(1 + fundY, year);
     const fundNet = isVGBL
-      ? fundGrowth - xout * (fundGrowth - 1)
-      : fundGrowth * (1 - xout);
+      ? fundGrowth - yearXout * (fundGrowth - 1)
+      : fundGrowth * (1 - yearXout);
     let refundComp: number;
     if (year < D) {
       refundComp = 0; // refund not yet received
