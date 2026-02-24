@@ -26,9 +26,9 @@ export async function POST(req: NextRequest) {
       { success: false, error: "Senha incorreta" },
       { status: 401 }
     );
-  } catch {
+  } catch (err: any) {
     return NextResponse.json(
-      { success: false, error: "Requisicao invalida" },
+      { success: false, error: `Requisicao invalida: ${err?.message || "unknown"}` },
       { status: 400 }
     );
   }
