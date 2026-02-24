@@ -39,6 +39,7 @@ export default function CompareDrawer({
       <div
         className="absolute inset-0 bg-black/30 backdrop-blur-sm"
         onClick={onClose}
+        aria-hidden="true"
       />
 
       <div role="dialog" aria-modal="true" aria-label="Comparar cenarios" className="relative max-h-[85vh] w-full max-w-3xl overflow-auto rounded-t-2xl bg-white p-6 shadow-2xl sm:rounded-2xl">
@@ -47,6 +48,7 @@ export default function CompareDrawer({
             Comparar cenarios ({scenarios.length}/3)
           </h2>
           <button
+            type="button"
             onClick={onClose}
             aria-label="Fechar comparacao"
             className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100"
@@ -73,6 +75,7 @@ export default function CompareDrawer({
                       <div className="flex items-center gap-2">
                         <span className="text-gray-700">{s.name}</span>
                         <button
+                          type="button"
                           onClick={() => onDelete(s.id)}
                           className="text-gray-300 hover:text-red-500"
                           aria-label={`Remover ${s.name}`}

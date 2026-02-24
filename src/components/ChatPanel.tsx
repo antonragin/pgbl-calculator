@@ -183,7 +183,7 @@ export default function ChatPanel({
       });
 
       if (!res.ok) {
-        let errorMsg = "Falha na comunicacao";
+        let errorMsg = `Falha na comunicacao (HTTP ${res.status})`;
         try {
           const err = await res.json();
           errorMsg = err.error || errorMsg;
@@ -266,6 +266,7 @@ export default function ChatPanel({
       <div
         className="absolute inset-0 bg-black/30 backdrop-blur-sm"
         onClick={onClose}
+        aria-hidden="true"
       />
 
       {/* Panel */}
@@ -297,6 +298,7 @@ export default function ChatPanel({
             </div>
           </div>
           <button
+            type="button"
             onClick={onClose}
             aria-label="Fechar assistente"
             className="rounded-lg p-1.5 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600"
@@ -317,6 +319,7 @@ export default function ChatPanel({
               <div className="space-y-2">
                 {QUICK_PROMPTS.map((prompt) => (
                   <button
+                    type="button"
                     key={prompt}
                     onClick={() => handleSend(prompt)}
                     className="w-full rounded-lg border border-gray-200 p-2.5 text-left text-sm text-gray-600 transition-colors hover:border-primary-300 hover:bg-primary-50"

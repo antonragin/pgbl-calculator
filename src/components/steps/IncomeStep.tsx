@@ -45,6 +45,7 @@ export default function IncomeStep({ inputs, onChange }: Props) {
         <div className="mt-2 flex gap-2">
           {[60000, 120000, 240000, 500000].map((v) => (
             <button
+              type="button"
               key={v}
               onClick={() => onChange({ annualIncome: v })}
               className={`rounded-md px-3 py-1 text-xs font-medium transition-colors ${
@@ -70,10 +71,13 @@ export default function IncomeStep({ inputs, onChange }: Props) {
         <label className="mb-1.5 block text-sm font-medium text-gray-700">
           Modelo de declaracao do IR
         </label>
-        <div className="flex gap-3">
+        <div className="flex gap-3" role="radiogroup" aria-label="Modelo de declaracao do IR">
           {(["complete", "simplified"] as FilingMode[]).map((mode) => (
             <button
+              type="button"
               key={mode}
+              role="radio"
+              aria-checked={inputs.filingMode === mode}
               onClick={() => onChange({ filingMode: mode })}
               className={`flex-1 rounded-lg border-2 p-3 text-left text-sm transition-all ${
                 inputs.filingMode === mode
@@ -105,10 +109,13 @@ export default function IncomeStep({ inputs, onChange }: Props) {
         <label className="mb-1.5 block text-sm font-medium text-gray-700">
           Contribui para INSS/previdencia oficial?
         </label>
-        <div className="flex gap-3">
+        <div className="flex gap-3" role="radiogroup" aria-label="Contribui para INSS">
           {[true, false].map((v) => (
             <button
+              type="button"
               key={String(v)}
+              role="radio"
+              aria-checked={inputs.contributesToINSS === v}
               onClick={() => onChange({ contributesToINSS: v })}
               className={`flex-1 rounded-lg border-2 p-3 text-center text-sm font-medium transition-all ${
                 inputs.contributesToINSS === v

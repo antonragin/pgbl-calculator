@@ -55,11 +55,11 @@ export default function ResultsDashboard({
 
       {/* Actions */}
       <div className="flex flex-col gap-3 sm:flex-row">
-        <button onClick={onSaveScenario} className="btn-secondary flex-1">
+        <button type="button" onClick={onSaveScenario} className="btn-secondary flex-1">
           <span className="mr-2">&#128190;</span>
           Salvar cenario
         </button>
-        <button onClick={onOpenChat} className="btn-primary flex-1">
+        <button type="button" onClick={onOpenChat} className="btn-primary flex-1">
           <span className="mr-2">&#128172;</span>
           Perguntar ao assistente
         </button>

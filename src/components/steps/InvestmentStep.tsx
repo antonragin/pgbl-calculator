@@ -73,6 +73,7 @@ export default function InvestmentStep({ inputs, onChange }: Props) {
         <div className="mt-2 flex gap-2">
           {[5, 10, 15, 20].map((y) => (
             <button
+              type="button"
               key={y}
               onClick={() => onChange({ horizonYears: y })}
               className={`rounded-md px-3 py-1 text-xs font-medium transition-colors ${
@@ -92,14 +93,17 @@ export default function InvestmentStep({ inputs, onChange }: Props) {
         <label className="mb-1.5 block text-sm font-medium text-gray-700">
           Imposto sobre ganhos do investimento comparativo
         </label>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Imposto sobre ganhos do investimento comparativo">
           {[
             { value: 0, label: "0% (isento)" },
             { value: 0.15, label: "15% (tipico)" },
             { value: 0.225, label: "22.5% (curto prazo)" },
           ].map((opt) => (
             <button
+              type="button"
               key={opt.label}
+              role="radio"
+              aria-checked={inputs.capitalGainsTax === opt.value}
               onClick={() => onChange({ capitalGainsTax: opt.value })}
               className={`flex-1 rounded-lg border-2 p-3 text-center text-sm transition-all ${
                 inputs.capitalGainsTax === opt.value
@@ -122,14 +126,17 @@ export default function InvestmentStep({ inputs, onChange }: Props) {
         <label className="mb-1.5 block text-sm font-medium text-gray-700">
           Prazo de recebimento do reembolso do IR
         </label>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Prazo de recebimento do reembolso do IR">
           {[
             { value: 0.5, label: "6 meses (mai/jun)" },
             { value: 0.75, label: "9 meses (set)" },
             { value: 1.0, label: "12 meses (tarde)" },
           ].map((opt) => (
             <button
+              type="button"
               key={opt.value}
+              role="radio"
+              aria-checked={inputs.refundDelayYears === opt.value}
               onClick={() => onChange({ refundDelayYears: opt.value })}
               className={`flex-1 rounded-lg border-2 p-2.5 text-center text-xs transition-all sm:text-sm ${
                 inputs.refundDelayYears === opt.value

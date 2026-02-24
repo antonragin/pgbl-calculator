@@ -29,10 +29,13 @@ export default function ContributionStep({ inputs, onChange }: Props) {
         <label className="mb-1.5 block text-sm font-medium text-gray-700">
           Tipo de plano
         </label>
-        <div className="flex gap-3">
+        <div className="flex gap-3" role="radiogroup" aria-label="Tipo de plano">
           {(["PGBL", "VGBL"] as Wrapper[]).map((w) => (
             <button
+              type="button"
               key={w}
+              role="radio"
+              aria-checked={inputs.wrapper === w}
               onClick={() => onChange({ wrapper: w })}
               className={`flex-1 rounded-lg border-2 p-3 text-center transition-all ${
                 inputs.wrapper === w
@@ -76,6 +79,7 @@ export default function ContributionStep({ inputs, onChange }: Props) {
           <div className="flex gap-2">
             {[0.03, 0.06, 0.12].map((p) => (
               <button
+                type="button"
                 key={p}
                 onClick={() => onChange({ contributionPct: p })}
                 className={`rounded-md px-3 py-1 text-xs font-medium transition-colors ${
@@ -106,7 +110,7 @@ export default function ContributionStep({ inputs, onChange }: Props) {
         <label className="mb-1.5 block text-sm font-medium text-gray-700">
           Regime de tributacao no resgate
         </label>
-        <div className="space-y-2">
+        <div className="space-y-2" role="radiogroup" aria-label="Regime de tributacao no resgate">
           {(
             [
               {
@@ -127,7 +131,10 @@ export default function ContributionStep({ inputs, onChange }: Props) {
             ]
           ).map((opt) => (
             <button
+              type="button"
               key={opt.value}
+              role="radio"
+              aria-checked={inputs.regime === opt.value}
               onClick={() => onChange({ regime: opt.value })}
               className={`w-full rounded-lg border-2 p-3 text-left text-sm transition-all ${
                 inputs.regime === opt.value
