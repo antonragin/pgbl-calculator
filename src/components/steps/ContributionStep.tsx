@@ -51,9 +51,8 @@ export default function ContributionStep({ inputs, onChange }: Props) {
         </div>
         {inputs.wrapper === "VGBL" && (
           <p className="mt-2 rounded-md bg-blue-50 p-2 text-xs text-blue-700">
-            O VGBL e tributado apenas sobre os rendimentos. A modelagem
-            completa do VGBL esta prevista para v2. Por ora, o simulador foca
-            no PGBL.
+            No VGBL, nao ha deducao do IR (beneficio fiscal = 0). O imposto no
+            resgate incide apenas sobre os rendimentos, nao sobre o valor total.
           </p>
         )}
       </div>

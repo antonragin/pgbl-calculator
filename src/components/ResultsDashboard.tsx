@@ -24,11 +24,9 @@ export default function ResultsDashboard({
       {/* Hero callout */}
       <div className="rounded-xl bg-gradient-to-r from-primary-600 to-primary-700 p-5 text-white shadow-lg">
         <p className="text-sm font-medium text-primary-100">
-          Seu reembolso estimado de{" "}
-          <span className="font-bold text-white">
-            {formatBRL(derived.refundAmount)}
-          </span>{" "}
-          investido por {inputs.horizonYears} anos gera uma vantagem de
+          Ao usar {inputs.wrapper} por {inputs.horizonYears} anos, a combinacao de
+          beneficio fiscal{derived.refundAmount > 0 ? ` (reembolso de ${formatBRL(derived.refundAmount)})` : ""} e
+          tributacao no resgate gera uma vantagem total de
         </p>
         <p className="mt-2 text-3xl font-bold">
           {advantage >= 0 ? "+" : ""}

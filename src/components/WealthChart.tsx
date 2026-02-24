@@ -76,11 +76,6 @@ export default function WealthChart({
 
   useEffect(() => {
     if (!isPlaying) return;
-    if (animationProgress >= maxYear) {
-      setIsPlaying(false);
-      setHasAnimated(true);
-      return;
-    }
 
     const interval = setInterval(() => {
       setAnimationProgress((prev) => {
@@ -95,7 +90,7 @@ export default function WealthChart({
     }, 80);
 
     return () => clearInterval(interval);
-  }, [isPlaying, animationProgress, maxYear]);
+  }, [isPlaying, maxYear]);
 
   const visibleData = useMemo(() => {
     const endIdx = animationProgress;
