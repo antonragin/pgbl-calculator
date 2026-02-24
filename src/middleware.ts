@@ -1,9 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-
-const COOKIE_NAME = "pgbl_auth";
-const SIGNING_KEY = process.env.COOKIE_SECRET
-  || `cookie-sign:${process.env.SITE_PASSWORD || "OryxRulezzz2026!"}`;
-const MAX_AGE_MS = 60 * 60 * 24 * 7 * 1000; // 7 days in ms
+import { COOKIE_NAME, SIGNING_KEY, MAX_AGE_MS } from "./lib/authConstants";
 
 const PUBLIC_PATHS = ["/login", "/api/auth"];
 

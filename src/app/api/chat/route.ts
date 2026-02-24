@@ -59,11 +59,17 @@ export async function POST(req: NextRequest) {
     }
 
     // Only allow user/assistant roles from client to prevent system prompt injection
+    const MAX_MESSAGES = 20;
+    const MAX_CONTENT_LENGTH = 2000;
     const validRoles = new Set(["user", "assistant"]);
     const sanitizedMessages = Array.isArray(messages)
       ? messages
           .filter((m: any) => validRoles.has(m.role) && typeof m.content === "string")
-          .map((m: any) => ({ role: m.role as string, content: m.content as string }))
+          .map((m: any) => ({
+            role: m.role as string,
+            content: (m.content as string).slice(0, MAX_CONTENT_LENGTH),
+          }))
+          .slice(-MAX_MESSAGES)
       : [];
 
     const apiMessages = [

@@ -90,9 +90,9 @@ export default function ChatPanel({
   useEffect(() => {
     scrollRef.current?.scrollTo({
       top: scrollRef.current.scrollHeight,
-      behavior: "smooth",
+      behavior: isStreaming ? "auto" : "smooth",
     });
-  }, [messages]);
+  }, [messages, isStreaming]);
 
   const buildContext = useCallback(() => {
     if (!simulationResult) return null;
