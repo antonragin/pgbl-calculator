@@ -104,6 +104,8 @@ export async function POST(req: NextRequest) {
     clearTimeout(fetchTimeout);
 
     if (!response.ok) {
+      // Consume the error body to release the connection
+      try { await response.text(); } catch { /* ignore */ }
       return new Response(
         JSON.stringify({ error: "Erro na comunicacao com o assistente" }),
         { status: 502, headers: { "Content-Type": "application/json" } }

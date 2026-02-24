@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect } from "react";
 import { ChatMessage, SimulationResult } from "@/lib/types";
 import { lockScroll, unlockScroll } from "@/lib/scrollLock";
 
@@ -114,7 +114,7 @@ export default function ChatPanel({
     });
   }, [messages, isStreaming]);
 
-  const buildContext = useCallback(() => {
+  function buildContext() {
     if (!simulationResult) return null;
     const { inputs, derived, terminalA, terminalB, annualizedDelta, breakEvenYear } =
       simulationResult;
@@ -135,7 +135,7 @@ export default function ChatPanel({
       delta_bps: annualizedDelta,
       break_even_ano: breakEvenYear,
     };
-  }, [simulationResult]);
+  }
 
   async function handleSend(text?: string) {
     const content = text || input.trim();
@@ -204,19 +204,41 @@ export default function ChatPanel({
       const reader = res.body?.getReader();
       if (!reader) throw new Error("No reader");
 
-      const decoder = new TextDecoder();
-      let accumulated = "";
+      try {
+        const decoder = new TextDecoder();
+        let accumulated = "";
 
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        accumulated += decoder.decode(value, { stream: true });
-        const current = accumulated;
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          accumulated += decoder.decode(value, { stream: true });
+          const current = accumulated;
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.id === assistantMsg.id ? { ...m, content: current } : m
+            )
+          );
+        }
+
+        // Flush any remaining bytes from the decoder
+        const remainder = decoder.decode();
+        if (remainder) {
+          accumulated += remainder;
+        }
+
+        // If stream ended with no content, show fallback message
+        if (!accumulated.trim()) {
+          accumulated = "Desculpe, nao recebi uma resposta. Tente novamente.";
+        }
+
+        const final_ = accumulated;
         setMessages((prev) =>
           prev.map((m) =>
-            m.id === assistantMsg.id ? { ...m, content: current } : m
+            m.id === assistantMsg.id ? { ...m, content: final_ } : m
           )
         );
+      } finally {
+        try { reader.cancel(); } catch { /* already closed */ }
       }
     } catch (err: unknown) {
       // Don't show error if request was intentionally aborted
