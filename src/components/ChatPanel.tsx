@@ -9,6 +9,37 @@ interface Props {
   simulationResult: SimulationResult | null;
 }
 
+// Max messages to send to API to avoid exceeding context window
+const MAX_HISTORY_MESSAGES = 20;
+
+// Simple markdown-like rendering for assistant messages
+function renderContent(text: string, isUser: boolean) {
+  if (isUser) return text;
+  // Split into paragraphs, then apply inline formatting
+  return text.split(/\n\n+/).map((para, i) => {
+    // Handle code blocks (```...```)
+    if (para.startsWith("```")) {
+      const code = para.replace(/^```\w*\n?/, "").replace(/\n?```$/, "");
+      return (
+        <pre key={i} className="my-1 overflow-x-auto rounded bg-gray-200 p-2 text-xs">
+          <code>{code}</code>
+        </pre>
+      );
+    }
+    // Inline formatting: **bold**, *italic*, `code`
+    const parts = para.split(/(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`)/).map((seg, j) => {
+      if (seg.startsWith("**") && seg.endsWith("**"))
+        return <strong key={j}>{seg.slice(2, -2)}</strong>;
+      if (seg.startsWith("*") && seg.endsWith("*"))
+        return <em key={j}>{seg.slice(1, -1)}</em>;
+      if (seg.startsWith("`") && seg.endsWith("`"))
+        return <code key={j} className="rounded bg-gray-200 px-1 text-xs">{seg.slice(1, -1)}</code>;
+      return seg;
+    });
+    return <p key={i} className={i > 0 ? "mt-2" : ""}>{parts}</p>;
+  });
+}
+
 const QUICK_PROMPTS = [
   "Por que o PGBL e vantajoso apos o break-even?",
   "O que significa o prazo de reembolso?",
@@ -106,10 +137,11 @@ export default function ChatPanel({
     setMessages((prev) => [...prev, assistantMsg]);
 
     try {
-      const chatHistory = [...messages, userMsg].map((m) => ({
-        role: m.role,
-        content: m.content,
-      }));
+      const allMessages = [...messages, userMsg];
+      // Keep only the last N messages to avoid exceeding API context limits
+      const chatHistory = allMessages
+        .slice(-MAX_HISTORY_MESSAGES)
+        .map((m) => ({ role: m.role, content: m.content }));
 
       // Cancel any previous in-flight request
       abortRef.current?.abort();
@@ -262,7 +294,9 @@ export default function ChatPanel({
                     : "bg-gray-100 text-gray-800"
                 }`}
               >
-                {msg.content || (
+                {msg.content ? (
+                  renderContent(msg.content, msg.role === "user")
+                ) : (
                   <span className="inline-flex gap-1">
                     <span className="animate-pulse">●</span>
                     <span className="animate-pulse" style={{ animationDelay: "150ms" }}>●</span>
