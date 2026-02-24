@@ -64,7 +64,6 @@ export async function POST(req: NextRequest) {
     });
 
     if (!response.ok) {
-      const err = await response.text();
       return new Response(
         JSON.stringify({ error: `OpenAI API error: ${response.status}` }),
         { status: 502, headers: { "Content-Type": "application/json" } }

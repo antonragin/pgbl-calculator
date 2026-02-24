@@ -12,7 +12,6 @@ import AdvancedStep from "@/components/steps/AdvancedStep";
 import ResultsDashboard from "@/components/ResultsDashboard";
 import ChatPanel from "@/components/ChatPanel";
 import CompareDrawer from "@/components/CompareDrawer";
-import { v4 as uuidv4 } from "uuid";
 
 const STEPS = [
   { label: "Renda", icon: <span>&#128176;</span> },
@@ -60,7 +59,7 @@ export default function HomePage() {
     }
     const name = `Cenario ${savedScenarios.length + 1}`;
     const scenario: SavedScenario = {
-      id: uuidv4(),
+      id: crypto.randomUUID(),
       name,
       createdAt: new Date().toISOString(),
       result,

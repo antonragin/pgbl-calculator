@@ -2,7 +2,6 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { ChatMessage, SimulationResult } from "@/lib/types";
-import { v4 as uuidv4 } from "uuid";
 
 interface Props {
   isOpen: boolean;
@@ -70,7 +69,7 @@ export default function ChatPanel({
     if (!content || isStreaming) return;
 
     const userMsg: ChatMessage = {
-      id: uuidv4(),
+      id: crypto.randomUUID(),
       role: "user",
       content,
       timestamp: Date.now(),
@@ -81,7 +80,7 @@ export default function ChatPanel({
     setIsStreaming(true);
 
     const assistantMsg: ChatMessage = {
-      id: uuidv4(),
+      id: crypto.randomUUID(),
       role: "assistant",
       content: "",
       timestamp: Date.now(),
