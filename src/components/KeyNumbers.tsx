@@ -25,14 +25,14 @@ export default function KeyNumbers({ result }: Props) {
     {
       label: "Patrimonio sem PGBL",
       value: formatBRL(terminalValueA),
-      sub: `Retorno liquido: ${formatPct(terminalA - 1)}`,
+      sub: `Retorno acumulado em ${inputs.horizonYears}a: ${formatPct(terminalA - 1)}`,
       color: "text-gray-600",
       bg: "bg-gray-50",
     },
     {
       label: "Patrimonio com PGBL",
       value: formatBRL(terminalValueB),
-      sub: `Retorno liquido: ${formatPct(terminalB - 1)}`,
+      sub: `Retorno acumulado em ${inputs.horizonYears}a: ${formatPct(terminalB - 1)}`,
       color: "text-primary-600",
       bg: "bg-primary-50",
     },

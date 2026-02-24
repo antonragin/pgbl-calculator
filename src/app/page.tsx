@@ -29,9 +29,21 @@ export default function HomePage() {
   const [viewMode, setViewMode] = useState<ViewMode>("beginner");
   const [chatOpen, setChatOpen] = useState(false);
   const [compareOpen, setCompareOpen] = useState(false);
-  const [savedScenarios, setSavedScenarios] = useState<SavedScenario[]>([]);
+  const [savedScenarios, setSavedScenarios] = useState<SavedScenario[]>(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      const stored = localStorage.getItem("pgbl_scenarios");
+      return stored ? JSON.parse(stored) : [];
+    } catch { return []; }
+  });
   const [toastMsg, setToastMsg] = useState<string | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Persist scenarios to localStorage
+  useEffect(() => {
+    try { localStorage.setItem("pgbl_scenarios", JSON.stringify(savedScenarios)); }
+    catch { /* storage full or unavailable */ }
+  }, [savedScenarios]);
 
   // Clean up toast timer on unmount
   useEffect(() => {

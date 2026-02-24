@@ -15,28 +15,49 @@ const MAX_HISTORY_MESSAGES = 20;
 // Simple markdown-like rendering for assistant messages
 function renderContent(text: string, isUser: boolean) {
   if (isUser) return text;
-  // Split into paragraphs, then apply inline formatting
-  return text.split(/\n\n+/).map((para, i) => {
-    // Handle code blocks (```...```)
-    if (para.startsWith("```")) {
-      const code = para.replace(/^```\w*\n?/, "").replace(/\n?```$/, "");
+
+  // First, extract code blocks (which may contain double newlines internally)
+  const segments: { type: "code" | "text"; content: string }[] = [];
+  const codeBlockRegex = /```(\w*)\n?([\s\S]*?)```/g;
+  let lastIndex = 0;
+  let match;
+
+  while ((match = codeBlockRegex.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      segments.push({ type: "text", content: text.slice(lastIndex, match.index) });
+    }
+    segments.push({ type: "code", content: match[2] });
+    lastIndex = match.index + match[0].length;
+  }
+  if (lastIndex < text.length) {
+    segments.push({ type: "text", content: text.slice(lastIndex) });
+  }
+
+  let keyIdx = 0;
+  return segments.map((seg) => {
+    if (seg.type === "code") {
       return (
-        <pre key={i} className="my-1 overflow-x-auto rounded bg-gray-200 p-2 text-xs">
-          <code>{code}</code>
+        <pre key={keyIdx++} className="my-1 overflow-x-auto rounded bg-gray-200 p-2 text-xs">
+          <code>{seg.content}</code>
         </pre>
       );
     }
-    // Inline formatting: **bold**, *italic*, `code`
-    const parts = para.split(/(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`)/).map((seg, j) => {
-      if (seg.startsWith("**") && seg.endsWith("**"))
-        return <strong key={j}>{seg.slice(2, -2)}</strong>;
-      if (seg.startsWith("*") && seg.endsWith("*"))
-        return <em key={j}>{seg.slice(1, -1)}</em>;
-      if (seg.startsWith("`") && seg.endsWith("`"))
-        return <code key={j} className="rounded bg-gray-200 px-1 text-xs">{seg.slice(1, -1)}</code>;
-      return seg;
+    // Split text segments into paragraphs
+    return seg.content.split(/\n\n+/).map((para) => {
+      const trimmed = para.trim();
+      if (!trimmed) return null;
+      // Inline formatting: **bold**, *italic*, `code`
+      const parts = trimmed.split(/(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`)/).map((s, j) => {
+        if (s.startsWith("**") && s.endsWith("**"))
+          return <strong key={j}>{s.slice(2, -2)}</strong>;
+        if (s.startsWith("*") && s.endsWith("*"))
+          return <em key={j}>{s.slice(1, -1)}</em>;
+        if (s.startsWith("`") && s.endsWith("`"))
+          return <code key={j} className="rounded bg-gray-200 px-1 text-xs">{s.slice(1, -1)}</code>;
+        return s;
+      });
+      return <p key={keyIdx++} className={keyIdx > 1 ? "mt-2" : ""}>{parts}</p>;
     });
-    return <p key={i} className={i > 0 ? "mt-2" : ""}>{parts}</p>;
   });
 }
 

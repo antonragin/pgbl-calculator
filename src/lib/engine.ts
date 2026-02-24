@@ -100,7 +100,8 @@ export function deriveValues(inputs: SimulationInputs): DerivedValues {
   );
 
   const maxDeductible = inputs.annualIncome * PGBL_DEDUCTIBLE_CAP;
-  const contributionAmount = inputs.annualIncome * inputs.contributionPct;
+  const contributionPct = Math.max(0, Math.min(1, inputs.contributionPct));
+  const contributionAmount = inputs.annualIncome * contributionPct;
   const deductibleAmount = Math.min(contributionAmount, maxDeductible);
   const refundAmount = deductibleAmount * xin;
 

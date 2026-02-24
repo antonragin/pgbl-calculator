@@ -98,60 +98,45 @@ export async function POST(req: NextRequest) {
 
     if (!response.ok) {
       return new Response(
-        JSON.stringify({ error: `OpenAI API error: ${response.status}` }),
+        JSON.stringify({ error: "Erro na comunicacao com o assistente" }),
         { status: 502, headers: { "Content-Type": "application/json" } }
       );
     }
 
-    // Stream the response
+    // Stream the response with a 60s timeout for the entire streaming phase
     const encoder = new TextEncoder();
     const decoder = new TextDecoder();
+    const streamTimeout = setTimeout(() => fetchController.abort(), 60000);
 
     const stream = new ReadableStream({
       async start(controller) {
         const reader = response.body?.getReader();
         if (!reader) {
+          clearTimeout(streamTimeout);
           controller.close();
           return;
         }
 
-        let buffer = "";
+        try {
+          let buffer = "";
 
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
 
-          buffer += decoder.decode(value, { stream: true });
-          const lines = buffer.split("\n");
-          buffer = lines.pop() || "";
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split("\n");
+            buffer = lines.pop() || "";
 
-          for (const line of lines) {
-            const trimmed = line.trim();
-            if (!trimmed || !trimmed.startsWith("data: ")) continue;
-            const data = trimmed.slice(6);
-            if (data === "[DONE]") {
-              controller.close();
-              return;
-            }
-
-            try {
-              const parsed = JSON.parse(data);
-              const content = parsed.choices?.[0]?.delta?.content;
-              if (content) {
-                controller.enqueue(encoder.encode(content));
+            for (const line of lines) {
+              const trimmed = line.trim();
+              if (!trimmed || !trimmed.startsWith("data: ")) continue;
+              const data = trimmed.slice(6);
+              if (data === "[DONE]") {
+                controller.close();
+                return;
               }
-            } catch {
-              // skip invalid JSON
-            }
-          }
-        }
 
-        // Process any remaining buffer content after stream ends
-        if (buffer.trim()) {
-          const trimmed = buffer.trim();
-          if (trimmed.startsWith("data: ")) {
-            const data = trimmed.slice(6);
-            if (data !== "[DONE]") {
               try {
                 const parsed = JSON.parse(data);
                 const content = parsed.choices?.[0]?.delta?.content;
@@ -163,9 +148,31 @@ export async function POST(req: NextRequest) {
               }
             }
           }
-        }
 
-        controller.close();
+          // Process any remaining buffer content after stream ends
+          if (buffer.trim()) {
+            const trimmed = buffer.trim();
+            if (trimmed.startsWith("data: ")) {
+              const data = trimmed.slice(6);
+              if (data !== "[DONE]") {
+                try {
+                  const parsed = JSON.parse(data);
+                  const content = parsed.choices?.[0]?.delta?.content;
+                  if (content) {
+                    controller.enqueue(encoder.encode(content));
+                  }
+                } catch {
+                  // skip invalid JSON
+                }
+              }
+            }
+          }
+        } catch {
+          // Network error or abort during streaming
+        } finally {
+          clearTimeout(streamTimeout);
+          controller.close();
+        }
       },
     });
 
