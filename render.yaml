@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: pgbl-calculator
+    runtime: node
+    buildCommand: npm install && npm run build
+    startCommand: node .next/standalone/server.js
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: SITE_PASSWORD
+        value: "OryxRulezzz2026!"
+      - key: PORT
+        value: "10000"

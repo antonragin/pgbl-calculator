@@ -1,0 +1,74 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  body {
+    @apply bg-gray-50 text-gray-900;
+  }
+}
+
+@layer components {
+  .input-field {
+    @apply w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm
+           transition-colors focus:border-primary-500 focus:outline-none focus:ring-2
+           focus:ring-primary-500/20;
+  }
+  .btn-primary {
+    @apply rounded-lg bg-primary-600 px-6 py-2.5 text-sm font-semibold text-white
+           transition-all hover:bg-primary-700 active:scale-[0.98] disabled:opacity-50
+           disabled:cursor-not-allowed;
+  }
+  .btn-secondary {
+    @apply rounded-lg border border-gray-300 bg-white px-6 py-2.5 text-sm font-semibold
+           text-gray-700 transition-all hover:bg-gray-50 active:scale-[0.98];
+  }
+  .card {
+    @apply rounded-xl border border-gray-200 bg-white p-6 shadow-sm;
+  }
+}
+
+/* Currency input */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* Chart animation */
+@keyframes drawLine {
+  from { stroke-dashoffset: 2000; }
+  to { stroke-dashoffset: 0; }
+}
+
+.chart-line-animate {
+  stroke-dasharray: 2000;
+  animation: drawLine 1.5s ease-out forwards;
+}
+
+/* Smooth slider */
+input[type="range"] {
+  @apply h-2 w-full cursor-pointer appearance-none rounded-lg bg-gray-200;
+}
+input[type="range"]::-webkit-slider-thumb {
+  @apply h-5 w-5 appearance-none rounded-full bg-primary-600 shadow-md
+         transition-transform hover:scale-110;
+}
+
+/* Chat scrollbar */
+.chat-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.chat-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.chat-scroll::-webkit-scrollbar-thumb {
+  @apply rounded-full bg-gray-300;
+}
