@@ -92,7 +92,7 @@ export default function InvestmentStep({ inputs, onChange }: Props) {
         <label className="mb-1.5 block text-sm font-medium text-gray-700">
           Imposto sobre ganhos do investimento comparativo
         </label>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           {[
             { value: 0, label: "0% (isento)" },
             { value: 0.15, label: "15% (tipico)" },
@@ -122,7 +122,7 @@ export default function InvestmentStep({ inputs, onChange }: Props) {
         <label className="mb-1.5 block text-sm font-medium text-gray-700">
           Prazo de recebimento do reembolso do IR
         </label>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           {[
             { value: 0.5, label: "6 meses (mai/jun)" },
             { value: 0.75, label: "9 meses (set)" },

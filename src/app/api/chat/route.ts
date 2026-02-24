@@ -77,6 +77,8 @@ export async function POST(req: NextRequest) {
       ...sanitizedMessages,
     ];
 
+    const fetchController = new AbortController();
+    const fetchTimeout = setTimeout(() => fetchController.abort(), 30000);
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -90,7 +92,9 @@ export async function POST(req: NextRequest) {
         max_tokens: 1000,
         temperature: 0.7,
       }),
+      signal: fetchController.signal,
     });
+    clearTimeout(fetchTimeout);
 
     if (!response.ok) {
       return new Response(

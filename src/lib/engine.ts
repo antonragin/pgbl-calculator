@@ -132,7 +132,7 @@ export function runSimulation(inputs: SimulationInputs): SimulationResult {
   if (inputs.feesEnabled) {
     fundY = Math.max(0, Y - inputs.adminFeePct);
     if (inputs.performanceFeePct > 0) {
-      fundY = fundY * (1 - inputs.performanceFeePct);
+      fundY = Math.max(0, fundY * (1 - inputs.performanceFeePct));
     }
   }
 

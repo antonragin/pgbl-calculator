@@ -64,6 +64,11 @@ export default function WealthChart({
 
   const maxYear = timeseries.length - 1;
 
+  // Clean up play timer on unmount
+  useEffect(() => {
+    return () => { if (playTimerRef.current) clearTimeout(playTimerRef.current); };
+  }, []);
+
   // Auto-play animation on first render / data change
   useEffect(() => {
     setAnimationProgress(0);
@@ -92,14 +97,19 @@ export default function WealthChart({
     return () => clearInterval(interval);
   }, [isPlaying, maxYear]);
 
-  const visibleData = useMemo(() => {
-    const endIdx = animationProgress;
-    return timeseries.slice(0, endIdx + 1).map((d) => ({
+  const formattedData = useMemo(() =>
+    timeseries.map((d) => ({
       ...d,
       wealthA: Number((d.wealthA * 100).toFixed(2)),
       wealthB: Number((d.wealthB * 100).toFixed(2)),
-    }));
-  }, [timeseries, animationProgress]);
+    })),
+    [timeseries]
+  );
+
+  const visibleData = useMemo(() =>
+    formattedData.slice(0, animationProgress + 1),
+    [formattedData, animationProgress]
+  );
 
   function handlePlay() {
     setAnimationProgress(0);
