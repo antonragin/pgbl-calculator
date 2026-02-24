@@ -2,7 +2,7 @@
 
 import { SimulationInputs } from "@/lib/types";
 import { deriveValues, formatBRL, formatPct } from "@/lib/engine";
-import { estimateXout, RULES_VERSION, TAX_YEAR } from "@/lib/taxRules";
+import { RULES_VERSION, TAX_YEAR } from "@/lib/taxRules";
 
 interface Props {
   inputs: SimulationInputs;
@@ -11,7 +11,6 @@ interface Props {
 
 export default function AdvancedStep({ inputs, onChange }: Props) {
   const derived = deriveValues(inputs);
-  const xout = estimateXout(inputs.regime, inputs.horizonYears, inputs.annualIncome);
 
   return (
     <div className="space-y-6">
@@ -107,7 +106,7 @@ export default function AdvancedStep({ inputs, onChange }: Props) {
           <Row label="Contribuicao" value={`${formatPct(inputs.contributionPct, 0)} = ${formatBRL(derived.contributionAmount)}/ano`} />
           <Row label="Regime resgate" value={inputs.regime === "regressive" ? "Regressivo" : inputs.regime === "progressive" ? "Progressivo" : "Otimista"} />
           <Row label="Aliquota entrada (Xin)" value={formatPct(derived.xin)} />
-          <Row label="Aliquota saida (Xout)" value={formatPct(xout)} />
+          <Row label="Aliquota saida (Xout)" value={formatPct(derived.xout)} />
           <Row label="Retorno esperado" value={formatPct(inputs.expectedReturn)} />
           <Row label="Horizonte" value={`${inputs.horizonYears} anos`} />
           <Row label="IR ganhos comparativo" value={formatPct(inputs.capitalGainsTax)} />

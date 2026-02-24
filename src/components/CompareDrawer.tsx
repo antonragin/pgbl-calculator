@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { SavedScenario } from "@/lib/types";
 import { formatBRL, formatPct, formatBps } from "@/lib/engine";
+import { lockScroll, unlockScroll } from "@/lib/scrollLock";
 
 interface Props {
   isOpen: boolean;
@@ -20,13 +21,13 @@ export default function CompareDrawer({
   // Close on Escape key + lock body scroll
   useEffect(() => {
     if (!isOpen) return;
-    document.body.style.overflow = "hidden";
+    lockScroll();
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
     document.addEventListener("keydown", handleKey);
     return () => {
-      document.body.style.overflow = "";
+      unlockScroll();
       document.removeEventListener("keydown", handleKey);
     };
   }, [isOpen, onClose]);

@@ -45,7 +45,7 @@ export async function middleware(req: NextRequest) {
   // Allow public paths and static assets
   if (
     PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/")) ||
-    pathname.startsWith("/_next") ||
+    pathname.startsWith("/_next/static") || pathname.startsWith("/_next/image") ||
     pathname === "/favicon.ico"
   ) {
     return NextResponse.next();

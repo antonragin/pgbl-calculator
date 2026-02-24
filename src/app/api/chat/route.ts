@@ -177,6 +177,7 @@ export async function POST(req: NextRequest) {
           // Network error or abort during streaming
         } finally {
           clearTimeout(streamTimeout);
+          try { reader.cancel(); } catch { /* already closed */ }
           controller.close();
         }
       },

@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { ChatMessage, SimulationResult } from "@/lib/types";
+import { lockScroll, unlockScroll } from "@/lib/scrollLock";
 
 interface Props {
   isOpen: boolean;
@@ -99,12 +100,11 @@ export default function ChatPanel({
   // Cancel in-flight request when panel closes + lock body scroll
   useEffect(() => {
     if (isOpen) {
-      document.body.style.overflow = "hidden";
+      lockScroll();
     } else {
-      document.body.style.overflow = "";
       abortRef.current?.abort();
     }
-    return () => { document.body.style.overflow = ""; };
+    return () => { if (isOpen) unlockScroll(); };
   }, [isOpen]);
 
   useEffect(() => {

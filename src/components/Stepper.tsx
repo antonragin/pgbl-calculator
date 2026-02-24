@@ -16,7 +16,7 @@ export default function Stepper({ steps, currentStep, onStepClick }: StepperProp
         const isDone = i < currentStep;
 
         return (
-          <React.Fragment key={i}>
+          <React.Fragment key={step.label}>
             {i > 0 && (
               <div
                 className={`h-0.5 w-6 sm:w-10 transition-colors ${
