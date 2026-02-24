@@ -62,7 +62,7 @@ export default function CompareDrawer({
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="min-w-[600px] text-sm">
               <thead>
                 <tr className="border-b border-gray-200 text-left text-xs font-medium uppercase text-gray-400">
                   <th className="pb-2 pr-4">Metrica</th>

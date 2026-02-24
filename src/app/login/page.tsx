@@ -76,7 +76,7 @@ export default function LoginPage() {
                 required
               />
               {error && (
-                <p className="mt-2 text-sm text-red-600">{error}</p>
+                <p role="alert" className="mt-2 text-sm text-red-600">{error}</p>
               )}
             </div>
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback, useRef } from "react";
+import { useState, useMemo, useCallback, useRef, useEffect } from "react";
 import { SimulationInputs, SimulationResult, SavedScenario, ViewMode } from "@/lib/types";
 import { runSimulation } from "@/lib/engine";
 import { DEFAULT_INPUTS, PRESETS } from "@/lib/defaults";
@@ -32,6 +32,11 @@ export default function HomePage() {
   const [savedScenarios, setSavedScenarios] = useState<SavedScenario[]>([]);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Clean up toast timer on unmount
+  useEffect(() => {
+    return () => { if (toastTimer.current) clearTimeout(toastTimer.current); };
+  }, []);
 
   const handleInputChange = useCallback(
     (partial: Partial<SimulationInputs>) => {

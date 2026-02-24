@@ -172,9 +172,10 @@ export async function POST(req: NextRequest) {
       },
     });
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : "Internal error";
+    // Log actual error server-side, return generic message to client
+    console.error("[chat]", err instanceof Error ? err.message : err);
     return new Response(
-      JSON.stringify({ error: message }),
+      JSON.stringify({ error: "Erro interno do servidor. Tente novamente." }),
       { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
