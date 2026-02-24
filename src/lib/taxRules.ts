@@ -25,6 +25,10 @@ export const IRPF_ANNUAL_BRACKETS: TaxBracket[] = [
 // PGBL deductibility cap: 12% of taxable income
 export const PGBL_DEDUCTIBLE_CAP = 0.12;
 
+// Current SELIC rate (% p.a.) — update when Copom changes the target rate
+// Last updated: Feb 2026 (Copom decision Jan 2026 — 5th consecutive hold at 15%)
+export const SELIC_RATE = 0.15;
+
 // IOF on VGBL contributions exceeding R$600k/year (Decreto 12.499/2025, effective 2026)
 export const IOF_VGBL_THRESHOLD = 600_000;
 export const IOF_VGBL_RATE = 0.05;

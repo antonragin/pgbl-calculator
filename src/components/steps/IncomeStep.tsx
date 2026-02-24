@@ -71,6 +71,7 @@ export default function IncomeStep({ inputs, onChange }: Props) {
       <div>
         <label className="mb-1.5 block text-sm font-medium text-gray-700">
           Modelo de declaracao do IR
+          <span className="ml-1 font-normal text-gray-400">(escolha Completa se voce e CLT)</span>
         </label>
         <div className="flex gap-3" role="radiogroup" aria-label="Modelo de declaracao do IR">
           {(["complete", "simplified"] as FilingMode[]).map((mode) => (
@@ -112,6 +113,7 @@ export default function IncomeStep({ inputs, onChange }: Props) {
       <div>
         <label className="mb-1.5 block text-sm font-medium text-gray-700">
           Contribui para INSS/previdencia oficial?
+          <span className="ml-1 font-normal text-gray-400">(diga Sim se voce e CLT)</span>
         </label>
         <div className="flex gap-3" role="radiogroup" aria-label="Contribui para INSS">
           {[true, false].map((v) => (

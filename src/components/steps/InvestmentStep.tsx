@@ -1,6 +1,7 @@
 "use client";
 
 import { SimulationInputs } from "@/lib/types";
+import { SELIC_RATE } from "@/lib/taxRules";
 
 interface Props {
   inputs: SimulationInputs;
@@ -8,6 +9,8 @@ interface Props {
 }
 
 export default function InvestmentStep({ inputs, onChange }: Props) {
+  const aboveSelic = inputs.expectedReturn > SELIC_RATE;
+
   return (
     <div className="space-y-6">
       <div>
@@ -15,8 +18,7 @@ export default function InvestmentStep({ inputs, onChange }: Props) {
           Investimento e horizonte
         </h2>
         <p className="mt-1 text-sm text-gray-500">
-          Defina o retorno esperado, o horizonte de investimento e a tributacao
-          sobre ganhos do investimento comparativo.
+          Defina o retorno esperado e o horizonte de investimento.
         </p>
       </div>
 
@@ -44,8 +46,13 @@ export default function InvestmentStep({ inputs, onChange }: Props) {
         </div>
         <p className="mt-1 text-xs text-gray-400">
           Esta e uma premissa. O retorno real pode variar. Valores mais altos
-          ampliam a vantagem do PGBL.
+          ampliam a vantagem do {inputs.wrapper}.
         </p>
+        {aboveSelic && (
+          <p className="mt-2 rounded-md bg-amber-50 p-2 text-xs text-amber-700">
+            O retorno selecionado ({(inputs.expectedReturn * 100).toFixed(1)}%) esta acima da taxa SELIC atual ({(SELIC_RATE * 100).toFixed(0)}% a.a.). Tenha cuidado com premissas de retorno muito otimistas — retornos acima da SELIC implicam risco de mercado.
+          </p>
+        )}
       </div>
 
       {/* Horizon */}
@@ -88,12 +95,15 @@ export default function InvestmentStep({ inputs, onChange }: Props) {
         </div>
       </div>
 
-      {/* Capital gains tax on non-PGBL */}
+      {/* Capital gains tax on the COMPARISON investment (non-PGBL/VGBL) */}
       <div>
         <label className="mb-1.5 block text-sm font-medium text-gray-700">
-          Imposto sobre ganhos do investimento comparativo
+          IR sobre ganhos da alternativa sem {inputs.wrapper}
         </label>
-        <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Imposto sobre ganhos do investimento comparativo">
+        <p className="mb-2 text-xs text-gray-500">
+          Este imposto se aplica <strong>somente</strong> ao investimento alternativo (sem {inputs.wrapper}) usado como comparacao. Nao afeta o calculo do {inputs.wrapper} em si.
+        </p>
+        <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="IR sobre ganhos da alternativa de comparacao">
           {[
             { value: 0, label: "0% (isento)" },
             { value: 0.15, label: "15% (tipico)" },
@@ -116,56 +126,9 @@ export default function InvestmentStep({ inputs, onChange }: Props) {
           ))}
         </div>
         <p className="mt-1 text-xs text-gray-400">
-          A aliquota tipica de IR sobre ganhos de capital em renda fixa/variavel
-          e 15%. Investimentos isentos (LCI/LCA/poupanca) usam 0%.
+          Exemplo: se voce compararia o {inputs.wrapper} com um fundo de renda fixa, use 15%.
+          Para LCI/LCA/poupanca (isentos), use 0%.
         </p>
-      </div>
-
-      {/* Refund delay */}
-      <div>
-        <label className="mb-1.5 block text-sm font-medium text-gray-700">
-          Prazo de recebimento do reembolso do IR
-        </label>
-        {inputs.wrapper === "VGBL" ? (
-          <div className="rounded-lg border-2 border-gray-200 bg-gray-50 p-3">
-            <p className="text-sm text-gray-400">
-              Nao aplicavel para VGBL
-            </p>
-            <p className="mt-1 text-xs text-gray-400">
-              O VGBL nao gera reembolso de IR, pois nao ha deducao fiscal
-              na contribuicao.
-            </p>
-          </div>
-        ) : (
-          <>
-            <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Prazo de recebimento do reembolso do IR">
-              {[
-                { value: 0.5, label: "6 meses (mai/jun)" },
-                { value: 0.75, label: "9 meses (set)" },
-                { value: 1.0, label: "12 meses (tarde)" },
-              ].map((opt) => (
-                <button
-                  type="button"
-                  key={opt.value}
-                  role="radio"
-                  aria-checked={inputs.refundDelayYears === opt.value}
-                  onClick={() => onChange({ refundDelayYears: opt.value })}
-                  className={`flex-1 rounded-lg border-2 p-2.5 text-center text-xs transition-all sm:text-sm ${
-                    inputs.refundDelayYears === opt.value
-                      ? "border-primary-500 bg-primary-50 font-medium"
-                      : "border-gray-200 hover:border-gray-300"
-                  }`}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-            <p className="mt-1 text-xs text-gray-400">
-              O reembolso do IR normalmente chega meses depois da contribuicao.
-              Aqui estimamos quando esse dinheiro comeca a render.
-            </p>
-          </>
-        )}
       </div>
     </div>
   );

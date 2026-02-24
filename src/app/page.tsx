@@ -71,7 +71,12 @@ export default function HomePage() {
       } else {
         setAppView("inputs");
         if (typeof state.step === "number") {
-          setCurrentStep(state.step);
+          // Clamp step to valid range for current view mode
+          setViewMode((vm) => {
+            const maxStep = vm === "beginner" ? 2 : 3;
+            setCurrentStep(Math.min(state.step, maxStep));
+            return vm;
+          });
         }
       }
     };
@@ -187,21 +192,23 @@ export default function HomePage() {
                 Comparar ({savedScenarios.length})
               </button>
             )}
-            <button
-              type="button"
-              onClick={() => {
-                setViewMode((v) => {
-                  const next = v === "beginner" ? "advanced" : "beginner";
-                  if (next === "beginner") {
-                    setCurrentStep((s) => Math.min(s, 2));
-                  }
-                  return next;
-                });
-              }}
-              className="rounded-md bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-200"
-            >
-              {isBeginnerMode ? "Modo avancado" : "Modo simples"}
-            </button>
+            {appView === "inputs" && (
+              <button
+                type="button"
+                onClick={() => {
+                  setViewMode((v) => {
+                    const next = v === "beginner" ? "advanced" : "beginner";
+                    if (next === "beginner") {
+                      setCurrentStep((s) => Math.min(s, 2));
+                    }
+                    return next;
+                  });
+                }}
+                className="rounded-md bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-200"
+              >
+                {isBeginnerMode ? "Modo avancado" : "Modo simples"}
+              </button>
+            )}
             <button
               type="button"
               onClick={async () => {

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { SimulationInputs, Wrapper } from "@/lib/types";
 import { formatBRL } from "@/lib/engine";
 import { PGBL_DEDUCTIBLE_CAP, IOF_VGBL_THRESHOLD, IOF_VGBL_RATE } from "@/lib/taxRules";
@@ -10,6 +11,7 @@ interface Props {
 }
 
 export default function ContributionStep({ inputs, onChange }: Props) {
+  const [showExplainer, setShowExplainer] = useState(false);
   const maxDeductible = inputs.annualIncome * PGBL_DEDUCTIBLE_CAP;
   const contribution = inputs.annualIncome * inputs.contributionPct;
   const isPGBL = inputs.wrapper === "PGBL";
@@ -30,9 +32,19 @@ export default function ContributionStep({ inputs, onChange }: Props) {
 
       {/* Wrapper */}
       <div>
-        <label className="mb-1.5 block text-sm font-medium text-gray-700">
-          Tipo de plano
-        </label>
+        <div className="mb-1.5 flex items-center gap-1.5">
+          <label className="text-sm font-medium text-gray-700">
+            Tipo de plano
+          </label>
+          <button
+            type="button"
+            onClick={() => setShowExplainer(true)}
+            className="flex h-5 w-5 items-center justify-center rounded-full bg-gray-200 text-xs font-bold text-gray-500 transition-colors hover:bg-primary-100 hover:text-primary-700"
+            aria-label="O que e PGBL e VGBL?"
+          >
+            ?
+          </button>
+        </div>
         <div className="flex gap-3" role="radiogroup" aria-label="Tipo de plano">
           {(["PGBL", "VGBL"] as Wrapper[]).map((w) => (
             <button
@@ -146,6 +158,53 @@ export default function ContributionStep({ inputs, onChange }: Props) {
           </p>
         </div>
       </div>
+
+      {/* PGBL/VGBL explainer popup */}
+      {showExplainer && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-black/30 backdrop-blur-sm"
+            onClick={() => setShowExplainer(false)}
+            aria-hidden="true"
+          />
+          <div className="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+            <button
+              type="button"
+              onClick={() => setShowExplainer(false)}
+              aria-label="Fechar"
+              className="absolute right-3 top-3 rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+            >
+              <svg aria-hidden="true" className="h-5 w-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <h3 className="text-lg font-bold text-gray-900">PGBL vs VGBL</h3>
+            <div className="mt-4 space-y-4 text-sm text-gray-600">
+              <div className="rounded-lg bg-primary-50 p-3">
+                <p className="font-semibold text-primary-700">PGBL</p>
+                <p className="mt-1">
+                  Voce <strong>desconta do seu Imposto de Renda</strong> o que investir (ate 12% da renda). E como se o governo devolvesse parte do imposto pra voce investir. No resgate, voce paga imposto sobre <strong>tudo</strong> (o que investiu + o que rendeu).
+                </p>
+                <p className="mt-1 font-medium text-primary-700">
+                  Bom para: quem faz declaracao completa e contribui para o INSS (ex: CLT).
+                </p>
+              </div>
+              <div className="rounded-lg bg-blue-50 p-3">
+                <p className="font-semibold text-blue-700">VGBL</p>
+                <p className="mt-1">
+                  Voce <strong>nao ganha desconto no IR</strong>. Mas no resgate, o imposto incide <strong>so sobre os rendimentos</strong>, nao sobre o valor que voce colocou.
+                </p>
+                <p className="mt-1 font-medium text-blue-700">
+                  Bom para: quem faz declaracao simplificada ou nao contribui para o INSS.
+                </p>
+              </div>
+              <p className="text-xs text-gray-400">
+                Resumo: PGBL = desconto agora, imposto sobre tudo depois. VGBL = sem desconto agora, imposto so sobre o lucro depois.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
