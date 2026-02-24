@@ -82,12 +82,16 @@ export function estimateMarginalRate(annualTaxableIncome: number): number {
 
 /**
  * Get the regressive regime tax rate for a given holding period.
+ *
+ * Lei 11.053/2004 uses "igual ou inferior" (≤) boundaries:
+ *   ≤2yr → 35%, >2 and ≤4yr → 30%, etc.
+ * Matches proj002's regressive_rate() which uses `current_date <= boundary`.
  */
 export function getRegressiveRate(holdingYears: number): number {
-  const bracket = REGRESSIVE_SCHEDULE.find(
-    (b) => holdingYears >= b.minYears && holdingYears < b.maxYears
-  );
-  return bracket ? bracket.rate : 0.10;
+  for (const b of REGRESSIVE_SCHEDULE) {
+    if (holdingYears <= b.maxYears) return b.rate;
+  }
+  return 0.10;
 }
 
 /**
