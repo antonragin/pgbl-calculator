@@ -193,7 +193,7 @@ export async function POST(req: NextRequest) {
     });
   } catch (err: unknown) {
     // Log actual error server-side, return generic message to client
-    console.error("[chat]", err instanceof Error ? err.message : err);
+    console.error("[chat]", err instanceof Error ? err.message : "Unknown error");
     return new Response(
       JSON.stringify({ error: "Erro interno do servidor. Tente novamente." }),
       { status: 500, headers: { "Content-Type": "application/json" } }

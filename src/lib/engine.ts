@@ -77,6 +77,7 @@ function wealthB(
 function annualizedDelta(a: number, b: number, N: number): number {
   if (N <= 0 || a <= 0 || b <= 0) return 0;
   const deltaRaw = Math.pow(b, 1 / N) - Math.pow(a, 1 / N);
+  if (!isFinite(deltaRaw)) return 0;
   return deltaRaw * 10000; // basis points
 }
 

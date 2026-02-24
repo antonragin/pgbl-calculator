@@ -345,7 +345,7 @@ export default function ChatPanel({
                 {msg.content ? (
                   renderContent(msg.content, msg.role === "user")
                 ) : (
-                  <span className="inline-flex gap-1">
+                  <span className="inline-flex gap-1" role="status" aria-label="Gerando resposta">
                     <span className="animate-pulse">●</span>
                     <span className="animate-pulse" style={{ animationDelay: "150ms" }}>●</span>
                     <span className="animate-pulse" style={{ animationDelay: "300ms" }}>●</span>

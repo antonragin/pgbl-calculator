@@ -41,7 +41,10 @@ export default function HomePage() {
         (s: unknown): s is SavedScenario =>
           typeof s === "object" && s !== null &&
           "id" in s && "name" in s && "result" in s &&
-          typeof (s as SavedScenario).result?.derived?.contributionAmount === "number"
+          typeof (s as SavedScenario).result?.derived?.contributionAmount === "number" &&
+          typeof (s as SavedScenario).result?.inputs?.annualIncome === "number" &&
+          typeof (s as SavedScenario).result?.inputs?.horizonYears === "number" &&
+          Array.isArray((s as SavedScenario).result?.timeseries)
       );
     } catch { return []; }
   });
@@ -157,10 +160,7 @@ export default function HomePage() {
               onClick={async () => {
                 try {
                   await fetch("/api/auth", { method: "DELETE" });
-                } catch {
-                  // Clear cookie client-side as fallback
-                  document.cookie = "pgbl_auth=; Max-Age=0; path=/";
-                }
+                } catch { /* redirect will trigger middleware login */ }
                 window.location.href = "/login";
               }}
               className="rounded-md bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600"
@@ -250,7 +250,8 @@ export default function HomePage() {
                 ) : (
                   <button
                     onClick={handleSimulate}
-                    className="btn-primary px-8 py-2.5 text-sm"
+                    disabled={inputs.annualIncome === 0}
+                    className="btn-primary px-8 py-2.5 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Simular agora
                   </button>

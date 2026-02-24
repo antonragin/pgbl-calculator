@@ -27,18 +27,18 @@ function ChartTooltip({ active, payload, label }: { active?: boolean; payload?: 
       {a && (
         <p className="text-sm text-gray-600">
           <span className="mr-1.5 inline-block h-2 w-2 rounded-full bg-gray-400" />
-          Sem PGBL: {a.value.toFixed(1)}% do investido
+          Sem PGBL: {Number(a.value).toFixed(1)}% do investido
         </p>
       )}
       {b && (
         <p className="text-sm text-primary-700">
           <span className="mr-1.5 inline-block h-2 w-2 rounded-full bg-primary-500" />
-          Com PGBL: {b.value.toFixed(1)}% do investido
+          Com PGBL: {Number(b.value).toFixed(1)}% do investido
         </p>
       )}
       {a && b && (
         <p className="mt-1 text-xs font-medium text-accent-600">
-          Diferenca: {(b.value - a.value).toFixed(1)} p.p.
+          Diferenca: {(Number(b.value) - Number(a.value)).toFixed(1)} p.p.
         </p>
       )}
     </div>
